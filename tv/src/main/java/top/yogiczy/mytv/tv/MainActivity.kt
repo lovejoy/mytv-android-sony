@@ -125,7 +125,67 @@ class MainActivity : ComponentActivity() {
                 val handled = super.dispatchKeyEvent(event)
                 return true // 始终返回true，阻止事件传递给电视系统
             }
-            // 处理一些Sony电视可能使用的其他按键码
+            // USB遥控器可能使用的媒体控制键
+            KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Media Next key (Channel Down) intercepted")
+                    handleChannelDown()
+                }
+                return true
+            }
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Media Previous key (Channel Up) intercepted")
+                    handleChannelUp()
+                }
+                return true
+            }
+            // 翻页键
+            KeyEvent.KEYCODE_PAGE_UP -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Page Up key (Channel Up) intercepted")
+                    handleChannelUp()
+                }
+                return true
+            }
+            KeyEvent.KEYCODE_PAGE_DOWN -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Page Down key (Channel Down) intercepted")
+                    handleChannelDown()
+                }
+                return true
+            }
+            // 数字键盘的加减号
+            KeyEvent.KEYCODE_NUMPAD_ADD -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Numpad Add key (Channel Up) intercepted")
+                    handleChannelUp()
+                }
+                return true
+            }
+            KeyEvent.KEYCODE_NUMPAD_SUBTRACT -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Numpad Subtract key (Channel Down) intercepted")
+                    handleChannelDown()
+                }
+                return true
+            }
+            // 通用加减号
+            KeyEvent.KEYCODE_PLUS -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Plus key (Channel Up) intercepted")
+                    handleChannelUp()
+                }
+                return true
+            }
+            KeyEvent.KEYCODE_MINUS -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Minus key (Channel Down) intercepted")
+                    handleChannelDown()
+                }
+                return true
+            }
+            // 处理一些遥控器可能使用的其他按键码
             166, 167 -> { // KEYCODE_PROG_RED, KEYCODE_PROG_GREEN 有时用于频道切换
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     if (event.keyCode == 166) { // 红色按键可能映射为频道上
@@ -137,6 +197,14 @@ class MainActivity : ComponentActivity() {
                     }
                 }
                 return true
+            }
+            // 调试模式：记录所有未处理的按键，帮助识别USB遥控器的keycode
+            else -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Unknown key intercepted: keyCode=${event.keyCode}, scanCode=${event.scanCode}, displayLabel='${event.displayLabel}', keyCharacterMap=${event.keyCharacterMap}")
+                    // 如果是未知的按键，可以在这里添加临时处理逻辑
+                    // 例如检查scanCode或其他属性来识别特定的USB遥控器
+                }
             }
         }
         return super.dispatchKeyEvent(event)
