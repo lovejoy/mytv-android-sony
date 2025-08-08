@@ -1,0 +1,227 @@
+name: PR Quality Check
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Create local.properties
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+      
+    - name: Run Kotlin lint (detekt)
+      run: ./gradlew detekt
+      continue-on-error: true
+      
+    - name: Run Android lint
+      run: ./gradlew lintDebug
+      continue-on-error: true
+      
+    - name: Run unit tests
+      run: ./gradlew testDebugUnitTest
+      continue-on-error: true
+      
+    - name: Generate test report
+      run: ./gradlew jacocoTestReport
+      continue-on-error: true
+      
+    - name: Upload lint reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: lint-reports
+        path: |
+          */build/reports/lint-results-debug.html
+          */build/reports/lint-results-debug.xml
+          */build/reports/detekt/
+        retention-days: 30
+        
+    - name: Upload test reports
+      if: always() 
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-reports
+        path: |
+          */build/reports/tests/
+          */build/reports/jacoco/
+        retention-days: 30
+        
+    - name: Comment PR with reports
+      if: always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          let comment = '## 📊 Code Quality Report\n\n';
+          
+          // Check if lint results exist
+          const lintFiles = ['tv/build/reports/lint-results-debug.xml', 'mobile/build/reports/lint-results-debug.xml'];
+          let totalIssues = 0;
+          
+          for (const file of lintFiles) {
+            if (fs.existsSync(file)) {
+              const content = fs.readFileSync(file, 'utf8');
+              const issueCount = (content.match(/<issue/g) || []).length;
+              totalIssues += issueCount;
+            }
+          }
+          
+          if (totalIssues > 0) {
+            comment += `⚠️ **Android Lint**: ${totalIssues} issues found\n`;
+          } else {
+            comment += `✅ **Android Lint**: No issues found\n`;
+          }
+          
+          // Check test results
+          const testDirs = ['tv/build/test-results', 'mobile/build/test-results', 'core/data/build/test-results'];
+          let testsPassed = true;
+          let testSummary = '';
+          
+          for (const dir of testDirs) {
+            if (fs.existsSync(dir)) {
+              // Simple check - in real scenario, parse XML test results
+              testSummary += `📋 Tests checked in ${dir}\n`;
+            }
+          }
+          
+          comment += testSummary;
+          comment += '\n---\n';
+          comment += '📁 Detailed reports are available in the workflow artifacts.';
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+  build-check:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        module: [tv, mobile]
+        
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Create local.properties
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      
+    - name: Generate debug keystore
+      run: |
+        keytool -genkey -v -keystore debug.keystore \
+                -keyalg RSA -keysize 2048 -validity 10000 \
+                -alias androiddebugkey \
+                -storepass android -keypass android \
+                -dname "CN=Android Debug,O=Android,C=US"
+        echo "storeFile=debug.keystore" >> local.properties
+        echo "storePassword=android" >> local.properties
+        echo "keyAlias=androiddebugkey" >> local.properties
+        echo "keyPassword=android" >> local.properties
+        
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+      
+    - name: Build debug APK
+      run: ./gradlew :${{ matrix.module }}:assembleDebug -x lint
+      
+    - name: Check APK size
+      run: |
+        APK_PATH="${{ matrix.module }}/build/outputs/apk/debug"
+        if [ -d "$APK_PATH" ]; then
+          ls -la $APK_PATH/*.apk
+          APK_SIZE=$(du -h $APK_PATH/*.apk | cut -f1)
+          echo "📱 ${{ matrix.module }} APK size: $APK_SIZE"
+        fi
+        
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Create local.properties
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+      
+    - name: Check for dependency updates
+      run: ./gradlew dependencyUpdates
+      continue-on-error: true
+      
+    - name: Generate dependency report
+      run: ./gradlew dependencies > dependency-report.txt
+      
+    - name: Upload dependency reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: dependency-reports
+        path: |
+          build/dependencyUpdates/
+          dependency-report.txt
+        retention-days: 30

@@ -1,0 +1,165 @@
+name: Release MyTV Android
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g., v1.0.0)'
+        required: true
+        default: 'v1.0.0'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Create local.properties
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+      
+    - name: Generate release keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+        echo "storeFile=release.keystore" >> local.properties
+        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> local.properties
+        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> local.properties  
+        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> local.properties
+      env:
+        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        
+    - name: Generate debug keystore (fallback)
+      if: env.KEYSTORE_BASE64 == ''
+      run: |
+        keytool -genkey -v -keystore debug.keystore \
+                -keyalg RSA -keysize 2048 -validity 10000 \
+                -alias androiddebugkey \
+                -storepass android -keypass android \
+                -dname "CN=Android Debug,O=Android,C=US"
+        echo "storeFile=debug.keystore" >> local.properties
+        echo "storePassword=android" >> local.properties
+        echo "keyAlias=androiddebugkey" >> local.properties
+        echo "keyPassword=android" >> local.properties
+        
+    - name: Make gradlew executable
+      run: chmod +x ./gradlew
+      
+    - name: Build all Release APKs
+      run: |
+        ./gradlew :tv:assembleOriginalRelease -x lint
+        ./gradlew :mobile:assembleOriginalRelease -x lint  
+        ./gradlew :allinone:assembleOriginalRelease -x lint
+        
+    - name: Get version from tag
+      id: version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Rename APK files
+      run: |
+        cd tv/build/outputs/apk/original/release/
+        for file in *.apk; do
+          mv "$file" "mytv-android-tv-${{ steps.version.outputs.VERSION }}-$(echo $file | cut -d'-' -f4-)"
+        done
+        
+        cd ../../../../../mobile/build/outputs/apk/original/release/
+        for file in *.apk; do
+          mv "$file" "mytv-android-mobile-${{ steps.version.outputs.VERSION }}-$(echo $file | cut -d'-' -f4-)"
+        done
+        
+        cd ../../../../../allinone/build/outputs/apk/original/release/
+        for file in *.apk; do
+          mv "$file" "mytv-android-allinone-${{ steps.version.outputs.VERSION }}-$(echo $file | cut -d'-' -f4-)"
+        done
+        
+    - name: Generate changelog
+      id: changelog
+      run: |
+        if git tag --sort=-version:refname | head -2 | tail -1 > /dev/null 2>&1; then
+          PREVIOUS_TAG=$(git tag --sort=-version:refname | head -2 | tail -1)
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          echo "## 🚀 Changes in ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          git log --pretty=format:"- %s (%h)" $PREVIOUS_TAG..HEAD >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        else
+          echo "CHANGELOG=## 🚀 Initial Release ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        name: MyTV Android ${{ steps.version.outputs.VERSION }}
+        body: |
+          ${{ steps.changelog.outputs.CHANGELOG }}
+          
+          ## 📱 下载说明
+          
+          - **mytv-android-tv-*.apk**: Android TV 版本 (推荐大屏设备)
+          - **mytv-android-mobile-*.apk**: 手机版本 (推荐手机平板)
+          - **mytv-android-allinone-*.apk**: 完整版本 (包含所有功能)
+          
+          ## 📋 系统要求
+          
+          - Android 5.0+ (API Level 21+)
+          - 支持架构: armeabi-v7a, arm64-v8a
+          
+          ## 🔧 安装方式
+          
+          1. 下载对应版本的 APK 文件
+          2. 在设备上允许未知来源安装
+          3. 安装 APK 文件
+          
+          ---
+          
+          📖 更多信息请查看 [编译指南](https://github.com/yaoxieyoulei/mytv-android/blob/main/compile.md)
+        files: |
+          tv/build/outputs/apk/original/release/*.apk
+          mobile/build/outputs/apk/original/release/*.apk
+          allinone/build/outputs/apk/original/release/*.apk
+        draft: false
+        prerelease: false
+        generate_release_notes: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Upload to artifact (backup)
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apks-${{ steps.version.outputs.VERSION }}
+        path: |
+          tv/build/outputs/apk/original/release/*.apk
+          mobile/build/outputs/apk/original/release/*.apk
+          allinone/build/outputs/apk/original/release/*.apk
+        retention-days: 365
