@@ -37,15 +37,18 @@
             android:name=".MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|screenLayout|keyboardHidden"
             android:exported="true"
+            android:launchMode="singleTask"
             android:resizeableActivity="true"
             android:screenOrientation="sensorLandscape"
             android:supportsPictureInPicture="true"
             tools:ignore="DiscouragedApi">
-            <intent-filter>
+            <intent-filter android:priority="1000">
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+                <!-- 声明为媒体应用，提高按键处理优先级 -->
+                <category android:name="android.intent.category.APP_MEDIA" />
             </intent-filter>
         </activity>
 
