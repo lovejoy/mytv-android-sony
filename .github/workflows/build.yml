@@ -13,7 +13,7 @@ jobs:
     
     strategy:
       matrix:
-        module: [tv, mobile, allinone]
+        module: [tv]
         build-type: [debug, release]
         
     steps:

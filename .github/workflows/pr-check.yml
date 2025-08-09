@@ -88,7 +88,7 @@ jobs:
           let comment = '## 📊 Code Quality Report\n\n';
           
           // Check if lint results exist
-          const lintFiles = ['tv/build/reports/lint-results-debug.xml', 'mobile/build/reports/lint-results-debug.xml'];
+          const lintFiles = ['tv/build/reports/lint-results-debug.xml'];
           let totalIssues = 0;
           
           for (const file of lintFiles) {
@@ -106,7 +106,7 @@ jobs:
           }
           
           // Check test results
-          const testDirs = ['tv/build/test-results', 'mobile/build/test-results', 'core/data/build/test-results'];
+          const testDirs = ['tv/build/test-results', 'core/data/build/test-results'];
           let testsPassed = true;
           let testSummary = '';
           
@@ -133,7 +133,7 @@ jobs:
     
     strategy:
       matrix:
-        module: [tv, mobile]
+        module: [tv]
         
     steps:
     - name: Checkout repository

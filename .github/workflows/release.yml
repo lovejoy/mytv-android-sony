@@ -69,11 +69,9 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x ./gradlew
       
-    - name: Build all Release APKs
+    - name: Build TV Release APK
       run: |
         ./gradlew :tv:assembleOriginalRelease -x lint
-        ./gradlew :mobile:assembleOriginalRelease -x lint  
-        ./gradlew :allinone:assembleOriginalRelease -x lint
         
     - name: Get version from tag
       id: version
@@ -89,16 +87,6 @@ jobs:
         cd tv/build/outputs/apk/original/release/
         for file in *.apk; do
           mv "$file" "mytv-android-tv-${{ steps.version.outputs.VERSION }}-$(echo $file | cut -d'-' -f4-)"
-        done
-        
-        cd ../../../../../mobile/build/outputs/apk/original/release/
-        for file in *.apk; do
-          mv "$file" "mytv-android-mobile-${{ steps.version.outputs.VERSION }}-$(echo $file | cut -d'-' -f4-)"
-        done
-        
-        cd ../../../../../allinone/build/outputs/apk/original/release/
-        for file in *.apk; do
-          mv "$file" "mytv-android-allinone-${{ steps.version.outputs.VERSION }}-$(echo $file | cut -d'-' -f4-)"
         done
         
     - name: Generate changelog
@@ -127,8 +115,6 @@ jobs:
           ## 📱 下载说明
           
           - **mytv-android-tv-*.apk**: Android TV 版本 (推荐大屏设备)
-          - **mytv-android-mobile-*.apk**: 手机版本 (推荐手机平板)
-          - **mytv-android-allinone-*.apk**: 完整版本 (包含所有功能)
           
           ## 📋 系统要求
           
@@ -137,7 +123,7 @@ jobs:
           
           ## 🔧 安装方式
           
-          1. 下载对应版本的 APK 文件
+          1. 下载 APK 文件
           2. 在设备上允许未知来源安装
           3. 安装 APK 文件
           
@@ -146,8 +132,6 @@ jobs:
           📖 更多信息请查看 [编译指南](https://github.com/yaoxieyoulei/mytv-android/blob/main/compile.md)
         files: |
           tv/build/outputs/apk/original/release/*.apk
-          mobile/build/outputs/apk/original/release/*.apk
-          allinone/build/outputs/apk/original/release/*.apk
         draft: false
         prerelease: false
         generate_release_notes: false
@@ -160,6 +144,4 @@ jobs:
         name: release-apks-${{ steps.version.outputs.VERSION }}
         path: |
           tv/build/outputs/apk/original/release/*.apk
-          mobile/build/outputs/apk/original/release/*.apk
-          allinone/build/outputs/apk/original/release/*.apk
         retention-days: 365
