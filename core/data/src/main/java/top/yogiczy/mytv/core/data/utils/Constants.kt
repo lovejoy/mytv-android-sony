@@ -12,7 +12,7 @@ object Constants {
     /**
      * 应用 标题
      */
-    const val APP_TITLE = "天光云影"
+    const val APP_TITLE = "电视直播"
 
     /**
      * 应用 代码仓库
@@ -30,8 +30,8 @@ object Constants {
     val IPTV_SOURCE_LIST = IptvSourceList(
         listOf(
             IptvSource(
-                name = "无效占位订阅源",
-                url = "http://1.2.3.4/live.m3u",
+                name = "webview直播源",
+                url = "https://ghfast.top/https://raw.githubusercontent.com/yaoxieyoulei/YYKM_assets/main/webview.m3u",
             ),
         )
     )
@@ -47,8 +47,8 @@ object Constants {
     val EPG_SOURCE_LIST = EpgSourceList(
         listOf(
             EpgSource(
-                name = "默认节目单 fanmingming",
-                url = "https://live.fanmingming.com/e.xml",
+                name = "默认节目单 老张",
+                url = "https://epg.51zmt.top:8001/e.xml",
             ),
         )
     )
@@ -68,12 +68,12 @@ object Constants {
      * {name|uppercase} 转成大写
      *
      */
-    const val CHANNEL_LOGO_PROVIDER = "https://live.fanmingming.com/tv/{name|uppercase}.png"
+    const val CHANNEL_LOGO_PROVIDER = "https://gcore.jsdelivr.net/gh/taksssss/tv/icon/{name|uppercase}.png"
 
     /**
      * GitHub加速代理地址
      */
-    const val GITHUB_PROXY = "https://ghp.ci/"
+    const val GITHUB_PROXY = "https://ghfast.top/"
 
     /**
      * Git最新版本信息
