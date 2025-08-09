@@ -45,26 +45,18 @@ jobs:
       
     - name: Generate release keystore
       run: |
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release.keystore
-        echo "storeFile=release.keystore" >> local.properties
-        echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" >> local.properties
-        echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> local.properties  
-        echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> local.properties
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.jks
       env:
         KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         
     - name: Generate debug keystore (fallback)
       if: env.KEYSTORE_BASE64 == ''
       run: |
-        keytool -genkey -v -keystore debug.keystore \
+        keytool -genkey -v -keystore keystore.jks \
                 -keyalg RSA -keysize 2048 -validity 10000 \
                 -alias androiddebugkey \
                 -storepass android -keypass android \
                 -dname "CN=Android Debug,O=Android,C=US"
-        echo "storeFile=debug.keystore" >> local.properties
-        echo "storePassword=android" >> local.properties
-        echo "keyAlias=androiddebugkey" >> local.properties
-        echo "keyPassword=android" >> local.properties
         
     - name: Make gradlew executable
       run: chmod +x ./gradlew
@@ -72,6 +64,11 @@ jobs:
     - name: Build TV Release APK
       run: |
         ./gradlew :tv:assembleOriginalRelease -x lint
+      env:
+        KEYSTORE: keystore.jks
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         
     - name: Get version from tag
       id: version
