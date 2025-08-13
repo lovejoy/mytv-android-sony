@@ -1,135 +1,169 @@
-name: Build MyTV Android
+name: Kotlin CI
 
 on:
   push:
-    branches: [ main, develop, feature/* ]
-  pull_request:
-    branches: [ main, develop ]
-  workflow_dispatch:
+    branches:
+      - main
+      - beta
+      - dev
+  pull_request_target:
+    branches:
+      - dev
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    
-    strategy:
-      matrix:
-        module: [tv]
-        build-type: [debug, release]
-        
+
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Set up JDK 17
+      with:
+        fetch-depth: 0
+        submodules: 'true'
+    
+    - name: Init Empty Changelog
+      run: |
+          {
+            echo "changelog<<EOF"
+            echo "## Changelog"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+    - name: Get changelog
+      id: changelog
+      run: |
+          {
+            echo "changelog<<EOF"
+            echo "$(git log --pretty=format:"- %s (%h)" ${{ github.event.before }}..${{ github.sha }})"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+    
+    - name: Set up JDK
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
-        
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      
-    - name: Cache Gradle dependencies
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Create local.properties
-      run: |
-        echo "sdk.dir=$ANDROID_HOME" > local.properties
-        
-    - name: Generate debug keystore
-      run: |
-        keytool -genkey -v -keystore debug.keystore \
-                -keyalg RSA -keysize 2048 -validity 10000 \
-                -alias androiddebugkey \
-                -storepass android -keypass android \
-                -dname "CN=Android Debug,O=Android,C=US"
-                
-    - name: Update local.properties with keystore
-      run: |
-        echo "storeFile=debug.keystore" >> local.properties
-        echo "storePassword=android" >> local.properties
-        echo "keyAlias=androiddebugkey" >> local.properties
-        echo "keyPassword=android" >> local.properties
-        
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
-      
-    - name: Build Debug APK
-      if: matrix.build-type == 'debug'
-      run: ./gradlew :${{ matrix.module }}:assembleDebug -x lint
-      
-    - name: Build Release APK
-      if: matrix.build-type == 'release'
-      run: ./gradlew :${{ matrix.module }}:assembleOriginalRelease -x lint
-      
-    - name: Upload Debug APK
-      if: matrix.build-type == 'debug'
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.module }}-debug-apk
-        path: ${{ matrix.module }}/build/outputs/apk/debug/*.apk
-        retention-days: 30
-        
-    - name: Upload Release APK
-      if: matrix.build-type == 'release'
-      uses: actions/upload-artifact@v4
-      with:
-        name: ${{ matrix.module }}-release-apk
-        path: ${{ matrix.module }}/build/outputs/apk/original/release/*.apk
-        retention-days: 90
-        
-  test:
-    runs-on: ubuntu-latest
-    needs: build
+        cache: gradle
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
     
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    - name: Add signing properties
+      run: |
+          echo ${{ secrets.SIGNING_PROPERTIES }} > encoded_signing_properties
+          base64 -d -i encoded_signing_properties > signing.properties
+
+    - name: Add jks file
+      run: |
+          echo ${{ secrets.SIGN_KEY }} > ./encoded_key
+          base64 -d -i encoded_key > keystore.jks
       
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
+    - name : Add SHORT_SHA Environment Variable
+      id   : short-sha
+      shell: bash      
+      run  : echo "short_sha=`git rev-parse --short HEAD`" >> $GITHUB_ENV
+
+    - name: Build with Gradle (Release)
+      if: github.ref == 'refs/heads/main'
+      env:
+            VERSION_CODE: ${{ github.run_number }}
+      run: ./gradlew :tv:assembleRelease
+    
+    - name: Build with Gradle (Dev)
+      if: (github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/dev')
+      env:
+            SENTRY_AUTH_TQOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+            SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+            VERSION_CODE: ${{ github.run_number }}
+      run: ./gradlew :tv:assembleDebug --warning-mode=all
+
+    - name: Move Metadata (Dev)
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/dev')
+      run: |
+        mv tv/build/outputs/apk/original/debug/output-metadata.json tv/build/outputs/apk/release/output-metadata.json
+
+    - name: Move Metadata  (Release)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        mv tv/build/outputs/apk/original/release/output-metadata.json tv/build/outputs/apk/release/output-metadata.json
+
+    - name: Read apk output metadata
+      if: github.event_name == 'push'
+      id: apk-meta-release
+      uses: juliangruber/read-file-action@v1
       with:
-        java-version: '17'
-        distribution: 'temurin'
+        path: tv/build/outputs/apk/release/output-metadata.json
+
+    - name: Parse apk infos
+      if: github.event_name == 'push'
+      run: |
+        echo "info_version_code=${{ fromJson(steps.apk-meta-release.outputs.content).elements[0].versionCode }}" >> $GITHUB_ENV
+        echo "info_version_name=${{ fromJson(steps.apk-meta-release.outputs.content).elements[0].versionName }}" >> $GITHUB_ENV
+    
+    - name: Gen Tag(Release)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        echo "release_title=V${{ env.info_version_name }} （稳定版）" >> $GITHUB_ENV
+        echo "gitee_repo=mytvstable" >> $GITHUB_ENV
+    
+    - name: Gen Tag(Beta)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/beta'
+      run: |
+        echo "release_title=V${{ env.info_version_name }} （测试版）" >> $GITHUB_ENV
+        echo "gitee_repo=mytvbeta" >> $GITHUB_ENV
+
+    - name: Gen Tag(Dev)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+      run: |
+        echo "release_title=V${{ env.info_version_name }} （开发版）" >> $GITHUB_ENV
+        echo "gitee_repo=mytvdev" >> $GITHUB_ENV
         
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
-      
-    - name: Cache Gradle dependencies
-      uses: actions/cache@v3
+    - name: Publish Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v2
       with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-          
-    - name: Create local.properties
-      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
-      
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
-      
-    - name: Run unit tests
-      run: ./gradlew testDebugUnitTest
-      
-    - name: Run lint checks
-      run: ./gradlew lintDebug
-      
-    - name: Upload test reports
-      if: always()
-      uses: actions/upload-artifact@v4
+        files: |
+            tv/build/outputs/apk/release/*.apk
+        tag_name: V${{ env.info_version_name }}
+        name: ${{ env.release_title }}
+        body: ${{ env.changelog }}
+        generate_release_notes: true
+        make_latest: true
+
+    - name: Publish Pre-Release
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/beta' || github.ref == 'refs/heads/dev')
+      uses: softprops/action-gh-release@v2
       with:
-        name: test-reports
-        path: |
-          */build/reports/tests/**
-          */build/reports/lint-results-debug.html
-        retention-days: 30
+        files: |
+            tv/build/outputs/apk/release/*.apk
+        tag_name: V${{ env.info_version_name }}
+        name: ${{ env.release_title }}
+        body: ${{ env.changelog }}
+        generate_release_notes: true
+        prerelease: true
+      
+    - name: create gitee release
+      if: github.event_name == 'push' && github.repository == 'mytv-android/mytv-android'
+      id: create_release 
+      uses: nicennnnnnnlee/action-gitee-release@v1.0.5
+      with:
+        gitee_owner: mytv-android
+        gitee_repo: ${{ env.gitee_repo }}
+        gitee_token: ${{ secrets.GITEE_TOKEN }}
+        gitee_tag_name: V${{ env.info_version_name }}
+        gitee_release_name: ${{ env.release_title }}
+        gitee_release_body: ${{ env.changelog }}
+        gitee_target_commitish: master
+
+    - name: upload file to gitee release
+      if: github.event_name == 'push' && github.repository == 'mytv-android/mytv-android'
+      uses: nicennnnnnnlee/action-gitee-release@v1.0.5
+      with:
+        gitee_owner: mytv-android
+        gitee_repo: ${{ env.gitee_repo }}
+        gitee_token: ${{ secrets.GITEE_TOKEN }}
+        gitee_release_id: ${{ steps.create_release.outputs.release-id }}
+        gitee_upload_retry_times:  3
+        gitee_files: |
+            tv/build/outputs/apk/release/*original.apk
+

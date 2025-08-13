@@ -192,7 +192,7 @@ fun MainScreen(
             composable(Screens.Live()) {
                 val doubleBackPressedExitState = rememberDoubleBackPressedExitState()
 
-                key(settingsViewModel.videoPlayerCore) {
+                key(settingsViewModel.videoPlayerCore, settingsViewModel.videoPlayerForceSoftDecode) {
                     top.yogiczy.mytv.tv.ui.screensold.main.components.MainContent(
                         filteredChannelGroupListProvider = filteredChannelGroupListProvider,
                         favoriteChannelListProvider = favoriteChannelListProvider,
@@ -205,9 +205,10 @@ fun MainScreen(
                                 navController.navigateSingleTop(Screens.Settings())
                             }
                         },
-                        toDashboardScreen  ={
+                        toDashboardScreen = {
                             navController.navigateSingleTop(Screens.Dashboard())
                         },
+                        onReload = { reload() },
                         onBackPressed = {
                             if (settingsViewModel.appStartupScreen == Screens.Live.name) {
                                 onBackPressed()

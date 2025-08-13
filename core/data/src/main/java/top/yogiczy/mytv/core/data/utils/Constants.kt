@@ -17,27 +17,28 @@ object Constants {
     /**
      * 应用 代码仓库
      */
-    const val APP_REPO = "https://github.com/yaoxieyoulei/mytv-android"
+    const val ORIGIN_APP_REPO = "https://github.com/yaoxieyoulei/mytv-android"
+    const val APP_REPO = "hhttps://github.com/mytv-android/mytv-android"
 
     /**
      * 交流群 telegram
      */
-    const val GROUP_TELEGRAM = "https://t.me/mytv_android"
+    const val GROUP_TELEGRAM = "https://t.me/mytv_android_channel"
 
     /**
-     * 直播源
+     * 播放源
      */
     val IPTV_SOURCE_LIST = IptvSourceList(
         listOf(
             IptvSource(
-                name = "webview直播源",
-                url = "https://ghfast.top/https://raw.githubusercontent.com/yaoxieyoulei/YYKM_assets/main/webview.m3u",
-            ),
+                name = "默认直播源 iptv-api",
+                url = "https://gitee.com/mytv-android/iptv-api/raw/master/output/result.m3u",
+            )
         )
     )
 
     /**
-     * 直播源缓存时间（毫秒）
+     * 播放源缓存时间（毫秒）
      */
     const val IPTV_SOURCE_CACHE_TIME = 1000 * 60 * 60 * 24L // 24小时
 
@@ -57,6 +58,11 @@ object Constants {
      * 节目单刷新时间阈值（小时）
      */
     const val EPG_REFRESH_TIME_THRESHOLD = 2 // 不到2点不刷新
+
+    /**
+     * 网页源央视频Cookie
+     */
+    const val HYBRID_YANGSHIPIN_COOKIE = ""
 
     /**
      * 频道图标提供
@@ -79,9 +85,9 @@ object Constants {
      * Git最新版本信息
      */
     val GIT_RELEASE_LATEST_URL = mapOf(
-        "stable" to "${GITHUB_PROXY}https://raw.githubusercontent.com/yaoxieyoulei/mytv-android-update/main/tv-stable.json",
-        "beta" to "${GITHUB_PROXY}https://raw.githubusercontent.com/yaoxieyoulei/mytv-android-update/main/tv-beta.json",
-        "dev" to "${GITHUB_PROXY}https://raw.githubusercontent.com/yaoxieyoulei/mytv-android-update/main/tv-dev.json",
+        "stable" to "https://gitee.com/api/v5/repos/mytv-android/mytvstable/releases/latest",
+        "beta" to "https://gitee.com/api/v5/repos/mytv-android/mytvbeta/releases/latest",
+        "dev" to "https://gitee.com/api/v5/repos/mytv-android/mytvdev/releases/latest",
     )
 
     /**
@@ -92,7 +98,7 @@ object Constants {
     /**
      * 网络请求重试间隔时间（毫秒）
      */
-    const val NETWORK_RETRY_INTERVAL = 3000L
+    const val NETWORK_RETRY_INTERVAL = 1000L
 
     /**
      * 播放器 userAgent
@@ -103,6 +109,11 @@ object Constants {
      * 播放器加载超时
      */
     const val VIDEO_PLAYER_LOAD_TIMEOUT = 1000L * 15 // 15秒
+
+    /**
+     * 播放器加载缓存时间
+     */
+    const val VIDEO_PLAYER_BUFFER_TIME = 0L
 
     /**
      * 日志历史最大保留条数

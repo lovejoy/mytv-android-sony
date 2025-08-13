@@ -9,10 +9,16 @@ import kotlinx.serialization.Serializable
 data class ChannelLine(
     val url: String = "",
     val httpUserAgent: String? = null,
+    val httpReferrer: String? = null,
+    val httpOrigin: String? = null,
+    val hybridType: HybridType = HybridType.None,
     val name: String? = if (url.contains("$")) url.split("$").lastOrNull() else null,
     val manifestType: String? = null,
     val licenseType: String? = null,
     val licenseKey: String? = null,
+    val playbackType: Int? = null,
+    val playbackFormat: String? = null,
+    var playbackUrl: String? = null,
 ) {
 
     val playableUrl: String
@@ -27,5 +33,10 @@ data class ChannelLine(
                 url = "http://1.2.3.4\$LR•IPV6『线路1』",
                 httpUserAgent = "okhttp",
             )
+    }
+
+    enum class HybridType {
+        None,
+        WebView,
     }
 }

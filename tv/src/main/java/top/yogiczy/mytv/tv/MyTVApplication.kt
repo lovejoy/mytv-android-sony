@@ -18,15 +18,17 @@ import io.sentry.android.core.SentryAndroid
 import top.yogiczy.mytv.core.data.AppData
 import top.yogiczy.mytv.core.data.utils.Globals
 import kotlin.system.exitProcess
+import com.tencent.smtt.sdk.QbSdk
 
 class MyTVApplication : Application(), ImageLoaderFactory {
     override fun onCreate() {
         super.onCreate()
-
+        
         initSentry()
         crashHandle()
         AppData.init(applicationContext)
         UnsafeTrustManager.enableUnsafeTrustManager()
+        
     }
 
     override fun newImageLoader(): ImageLoader {

@@ -23,6 +23,8 @@ import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.ch
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLine
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLineList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelList
+import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSource
+import top.yogiczy.mytv.core.data.entities.iptvsource.IptvSourceList
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgramme
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserve
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserveList
@@ -30,11 +32,13 @@ import top.yogiczy.mytv.core.data.utils.ChannelUtil
 import top.yogiczy.mytv.core.data.utils.Constants
 import top.yogiczy.mytv.core.data.utils.Loggable
 import top.yogiczy.mytv.core.util.utils.urlHost
+import top.yogiczy.mytv.tv.ui.utils.Configs
 import top.yogiczy.mytv.tv.ui.material.Snackbar
 import top.yogiczy.mytv.tv.ui.screen.settings.SettingsViewModel
 import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.VideoPlayerState
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
+import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.Media3VideoPlayer
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.rememberVideoPlayerState
 import java.net.URI
 import java.text.SimpleDateFormat
@@ -57,7 +61,6 @@ class MainContentState(
     val currentChannelLineIdx get() = _currentChannelLineIdx
 
     val currentChannelLine get() = _currentChannel.lineList[_currentChannelLineIdx]
-
     private var _currentPlaybackEpgProgramme by mutableStateOf<EpgProgramme?>(null)
     val currentPlaybackEpgProgramme get() = _currentPlaybackEpgProgramme
 
@@ -84,11 +87,25 @@ class MainContentState(
             _isVideoPlayerControllerScreenVisible = value
         }
 
+    private var _isIptvSourceScreenVisible by mutableStateOf(false)
+    var isIptvSourceScreenVisible
+        get() = _isIptvSourceScreenVisible
+        set(value) {
+            _isIptvSourceScreenVisible = value
+        }
+
     private var _isQuickOpScreenVisible by mutableStateOf(false)
     var isQuickOpScreenVisible
         get() = _isQuickOpScreenVisible
         set(value) {
             _isQuickOpScreenVisible = value
+        }
+    
+    private var _isInPlaybackMOde by mutableStateOf(false)
+    var isInPlaybackMode
+        get() = _isInPlaybackMOde
+        set(value) {
+            _isInPlaybackMOde = value
         }
 
     private var _isEpgScreenVisible by mutableStateOf(false)
@@ -216,15 +233,37 @@ class MainContentState(
     private fun getPrevChannel(): Channel {
         return getPrevFavoriteChannel() ?: run {
             val channelGroupList = channelGroupListProvider()
-            return if (settingsViewModel.iptvChannelChangeListLoop) {
-                val group =
-                    channelGroupList.getOrElse(channelGroupList.channelGroupIdx(_currentChannel)) { channelGroupList.first() }
-                val currentIdx = group.channelList.indexOf(_currentChannel)
-                group.channelList.getOrElse(currentIdx - 1) { group.channelList.last() }
-            } else {
+            
+            if (settingsViewModel.iptvChannelChangeCrossGroup) {
+                // 跨分组切换逻辑
                 val currentIdx = channelGroupList.channelIdx(_currentChannel)
-                channelGroupList.channelList.getOrElse(currentIdx - 1) {
+                val prevIdx = if (currentIdx <= 0) {
+                    if (settingsViewModel.iptvChannelChangeListLoop) 
+                        channelGroupList.channelList.size - 1 
+                    else 
+                        0
+                } else {
+                    currentIdx - 1
+                }
+                channelGroupList.channelList.getOrElse(prevIdx) {
                     channelGroupList.channelLastOrNull() ?: Channel()
+                }
+            } else {
+                // 分组内切换逻辑
+                val group = channelGroupList.getOrElse(channelGroupList.channelGroupIdx(_currentChannel)) { channelGroupList.first() }
+                val currentIdx = group.channelList.indexOf(_currentChannel)
+                if (currentIdx <= 0) {
+                    // 当前是分组内第一个
+                    if (settingsViewModel.iptvChannelChangeListLoop) {
+                        // 循环开启时，返回分组内最后一个
+                        group.channelList.last()
+                    } else {
+                        // 循环关闭时，保持当前频道不变
+                        _currentChannel
+                    }
+                } else {
+                    // 返回分组内前一个
+                    group.channelList[currentIdx - 1]
                 }
             }
         }
@@ -233,15 +272,37 @@ class MainContentState(
     private fun getNextChannel(): Channel {
         return getNextFavoriteChannel() ?: run {
             val channelGroupList = channelGroupListProvider()
-            return if (settingsViewModel.iptvChannelChangeListLoop) {
-                val group =
-                    channelGroupList.getOrElse(channelGroupList.channelGroupIdx(_currentChannel)) { channelGroupList.first() }
-                val currentIdx = group.channelList.indexOf(_currentChannel)
-                group.channelList.getOrElse(currentIdx + 1) { group.channelList.first() }
-            } else {
+            
+            if (settingsViewModel.iptvChannelChangeCrossGroup) {
+                // 跨分组切换逻辑
                 val currentIdx = channelGroupList.channelIdx(_currentChannel)
-                channelGroupList.channelList.getOrElse(currentIdx + 1) {
+                val nextIdx = if (currentIdx >= channelGroupList.channelList.size - 1) {
+                    if (settingsViewModel.iptvChannelChangeListLoop) 
+                        0 
+                    else 
+                        channelGroupList.channelList.size - 1
+                } else {
+                    currentIdx + 1
+                }
+                channelGroupList.channelList.getOrElse(nextIdx) {
                     channelGroupList.channelFirstOrNull() ?: Channel()
+                }
+            } else {
+                // 分组内切换逻辑
+                val group = channelGroupList.getOrElse(channelGroupList.channelGroupIdx(_currentChannel)) { channelGroupList.first() }
+                val currentIdx = group.channelList.indexOf(_currentChannel)
+                if (currentIdx >= group.channelList.size - 1) {
+                    // 当前是分组内最后一个
+                    if (settingsViewModel.iptvChannelChangeListLoop) {
+                        // 循环开启时，返回分组内第一个
+                        group.channelList.first()
+                    } else {
+                        // 循环关闭时，保持当前频道不变
+                        _currentChannel
+                    }
+                } else {
+                    // 返回分组内下一个
+                    group.channelList[currentIdx + 1]
                 }
             }
         }
@@ -265,14 +326,15 @@ class MainContentState(
 
     fun changeCurrentChannel(
         channel: Channel,
-        lineIdx: Int? = null,
+        lineIdx: Int? = null, 
         playbackEpgProgramme: EpgProgramme? = null,
     ) {
         settingsViewModel.iptvChannelLastPlay = channel
+        val realLineIdx = getLineIdx(channel.lineList, lineIdx)
 
-        if (channel == _currentChannel && lineIdx == _currentChannelLineIdx && playbackEpgProgramme == _currentPlaybackEpgProgramme) return
-
-        if (channel == _currentChannel && lineIdx != _currentChannelLineIdx) {
+        if (channel == _currentChannel && realLineIdx == _currentChannelLineIdx && playbackEpgProgramme == _currentPlaybackEpgProgramme) return
+        
+        if (channel == _currentChannel && realLineIdx != _currentChannelLineIdx) {
             settingsViewModel.iptvChannelLinePlayableUrlList -= currentChannelLine.url
             settingsViewModel.iptvChannelLinePlayableHostList -= currentChannelLine.url.urlHost()
         }
@@ -280,31 +342,84 @@ class MainContentState(
         _isTempChannelScreenVisible = true
 
         _currentChannel = channel
-        _currentChannelLineIdx = getLineIdx(_currentChannel.lineList, lineIdx)
-
+        _currentChannelLineIdx = realLineIdx
         _currentPlaybackEpgProgramme = playbackEpgProgramme
-
+        currentChannelLine.playbackUrl = null
+        isInPlaybackMode = false
         var url = currentChannelLine.url
         if (_currentPlaybackEpgProgramme != null) {
-            val timeFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
-            val query = listOf(
-                "playseek=",
-                timeFormat.format(_currentPlaybackEpgProgramme!!.startAt),
-                "-",
-                timeFormat.format(_currentPlaybackEpgProgramme!!.endAt),
-            ).joinToString("")
-            url = if (URI(url).query.isNullOrBlank()) "$url?$query" else "$url&$query"
-            url = ChannelUtil.urlToCanPlayback(url)
+            if(currentChannelLine.playbackType != null){
+                var playbackFormat = currentChannelLine.playbackFormat ?: ""
+                val timeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+                val tfY = SimpleDateFormat("yyyy", Locale.getDefault())
+                val tfM = SimpleDateFormat("MM", Locale.getDefault())
+                val tfD = SimpleDateFormat("dd", Locale.getDefault())
+                val tfH = SimpleDateFormat("HH", Locale.getDefault())
+                val tfm = SimpleDateFormat("mm", Locale.getDefault())
+                val tfS = SimpleDateFormat("ss", Locale.getDefault())
+                val nowTime = System.currentTimeMillis()
+                playbackFormat.apply{
+                        _currentPlaybackEpgProgramme?.let { epgProgramme ->
+                            replace("{utc}", timeFormat.format(epgProgramme.startAt))
+                            replace("\${start}", timeFormat.format(epgProgramme.startAt))
+                            replace("{lutc}", timeFormat.format(nowTime))
+                            replace("\${now}", tfY.format(nowTime))
+                            replace("\${timestamp}", timeFormat.format(nowTime))
+                            replace("{utcend}", timeFormat.format(epgProgramme.endAt))
+                            replace("\${end}", timeFormat.format(epgProgramme.endAt))
+                            replace("{Y}", tfY.format(epgProgramme.startAt))
+                            replace("{m}", tfM.format(epgProgramme.startAt))
+                            replace("{d}", tfD.format(epgProgramme.startAt))
+                            replace("{H}", tfH.format(epgProgramme.startAt))
+                            replace("{M}", tfm.format(epgProgramme.startAt))
+                            replace("{S}", tfS.format(epgProgramme.startAt))
+                        }
+                }
+                playbackFormat = ChannelUtil.replacePlaybackFormat(playbackFormat, _currentPlaybackEpgProgramme!!.startAt, nowTime, _currentPlaybackEpgProgramme!!.endAt)?:""
+                url = when (currentChannelLine.playbackType ?: 10) {
+                    0 -> playbackFormat
+                    1 -> "$url$playbackFormat"
+                    // 2 -> 
+                    // 3 -> 
+                    // 4 -> 
+                    else -> url
+                }
+            }else{
+                val timeFormat = SimpleDateFormat("yyyyMMddHHmmss", Locale.getDefault())
+                val query = listOf(
+                    "playseek=",
+                    timeFormat.format(_currentPlaybackEpgProgramme!!.startAt),
+                    "-",
+                    timeFormat.format(_currentPlaybackEpgProgramme!!.endAt),
+                ).joinToString("")
+                url = if (URI(url).query.isNullOrBlank()) "$url?$query" else "$url&$query"
+                if (Configs.iptvPLTVToTVOD){
+                    url = ChannelUtil.urlToCanPlayback(url)
+                }
+            }
+            currentChannelLine.playbackUrl = url
+            isInPlaybackMode = true
         }
+        
         val line = currentChannelLine.copy(url = url)
 
         log.d("播放${_currentChannel.name}（${_currentChannelLineIdx + 1}/${_currentChannel.lineList.size}）: $line")
 
-        if (line.url.startsWith("webview://")) {
+        if (line.hybridType == ChannelLine.HybridType.WebView) {
+            log.i("检测到WebView类型URL: ${line.url}")
+            log.i("正在使用WebView打开而不是视频播放器")
             videoPlayerState.metadata = VideoPlayer.Metadata()
             videoPlayerState.stop()
         } else {
-            videoPlayerState.prepare(line)
+            currentChannelLine.playbackUrl = null
+            log.i("检测到普通视频URL: ${line.url}")
+            log.i("hybridType: ${line.hybridType}, 使用视频播放器播放")
+            if(line.url.startsWith("rtsp://") && line.url.contains("smil") && (videoPlayerState.instance is Media3VideoPlayer)){
+                settingsViewModel.videoPlayerCore = Configs.VideoPlayerCore.IJK // Media3 1.6.0 不支持rtsp有效负载类型33
+            }else{
+                videoPlayerState.prepare(line)
+            }
+            
         }
     }
 
@@ -344,7 +459,8 @@ class MainContentState(
         lineIdx: Int? = _currentChannelLineIdx,
     ): Boolean {
         val currentLineIdx = getLineIdx(channel.lineList, lineIdx)
-        return ChannelUtil.urlSupportPlayback(channel.lineList[currentLineIdx].url)
+        return channel.lineList[currentLineIdx].playbackType != null || 
+        ChannelUtil.urlSupportPlayback(channel.lineList[currentLineIdx].url)
     }
 }
 

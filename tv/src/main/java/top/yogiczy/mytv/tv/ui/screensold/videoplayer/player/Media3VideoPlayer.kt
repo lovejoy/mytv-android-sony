@@ -21,8 +21,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.common.util.Util
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.rtmp.RtmpDataSource
 import androidx.media3.exoplayer.DecoderReuseEvaluation
 import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.DefaultLoadControl
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.analytics.AnalyticsListener
 import androidx.media3.exoplayer.dash.DashMediaSource
@@ -31,6 +34,7 @@ import androidx.media3.exoplayer.drm.FrameworkMediaDrm
 import androidx.media3.exoplayer.drm.LocalMediaDrmCallback
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.rtsp.RtspMediaSource
+import androidx.media3.exoplayer.smoothstreaming.SsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
@@ -41,9 +45,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.max
+
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLine
 import top.yogiczy.mytv.core.util.utils.toHeaders
 import top.yogiczy.mytv.tv.ui.utils.Configs
+import top.yogiczy.mytv.core.data.utils.Logger
 
 @OptIn(UnstableApi::class)
 class Media3VideoPlayer(
@@ -51,6 +58,7 @@ class Media3VideoPlayer(
     private val coroutineScope: CoroutineScope,
 ) : VideoPlayer(coroutineScope) {
 
+    private val logger = Logger.create("Media3VideoPlayer")
     private var videoPlayer = getPlayer()
 
     private var softDecode: Boolean? = null
@@ -75,7 +83,7 @@ class Media3VideoPlayer(
         val renderersFactory =
             DefaultRenderersFactory(context)
                 .setExtensionRendererMode(
-                    if (softDecode ?: Configs.videoPlayerForceAudioSoftDecode)
+                    if (softDecode ?: Configs.videoPlayerForceSoftDecode)
                         DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
                     else DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON
                 )
@@ -88,15 +96,25 @@ class Media3VideoPlayer(
                 .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
                 .setMaxVideoSize(Integer.MAX_VALUE, Integer.MAX_VALUE)
                 .setForceHighestSupportedBitrate(true)
-                .setPreferredTextLanguages("zh")
+                .setPreferredTextLanguage("zh")
                 .build()
         }
 
         // MediaCodecVideoRenderer.skipMultipleFramesOnSameVsync =
         //     Configs.videoPlayerSkipMultipleFramesOnSameVSync
+        val loadControl = DefaultLoadControl.Builder()
+            .setBufferDurationsMs(
+                Configs.videoPlayerBufferTime.toInt(), // 最小缓冲时间（毫秒） minBufferMs
+                max(Configs.videoPlayerBufferTime.toInt() * 5, 60 * 1000), // maxBufferMs
+                Configs.videoPlayerBufferTime.toInt(), // bufferForPlaybackMs
+                Configs.videoPlayerBufferTime.toInt(), // bufferForPlaybackAfterRebufferMs
+            )
+            .build()
+
         return ExoPlayer.Builder(context)
             .setRenderersFactory(renderersFactory)
             .setTrackSelector(trackSelector)
+            .setLoadControl(loadControl)
             .build()
             .apply { playWhenReady = true }
     }
@@ -121,11 +139,22 @@ class Media3VideoPlayer(
     }
 
     private fun getDataSourceFactory(): DefaultDataSource.Factory {
+        val headers = Configs.videoPlayerHeaders.toHeaders() + mapOf(
+            "Referer" to (currentChannelLine.httpReferrer ?: "")
+            ).filterValues { it.isNotEmpty() } + mapOf(
+                "Origin" to (currentChannelLine.httpOrigin ?: "")
+                ).filterValues { it.isNotEmpty() }
+
+        // 使用应用内日志系统
+        logger.i("播放地址: ${currentChannelLine.playableUrl}")
+        logger.i("请求头: $headers")
+        logger.i("User-Agent: ${currentChannelLine.httpUserAgent ?: Configs.videoPlayerUserAgent}")
+
         return DefaultDataSource.Factory(
             context,
             DefaultHttpDataSource.Factory().apply {
                 setUserAgent(currentChannelLine.httpUserAgent ?: Configs.videoPlayerUserAgent)
-                setDefaultRequestProperties(Configs.videoPlayerHeaders.toHeaders())
+                setDefaultRequestProperties(headers)
                 setConnectTimeoutMs(Configs.videoPlayerLoadTimeout.toInt())
                 setReadTimeoutMs(Configs.videoPlayerLoadTimeout.toInt())
                 setKeepPostFor302Redirects(true)
@@ -134,24 +163,65 @@ class Media3VideoPlayer(
         )
     }
 
+
     private fun getMediaSource(contentType: Int? = null): MediaSource? {
         val uri = Uri.parse(currentChannelLine.playableUrl)
         val mediaItem = MediaItem.fromUri(uri)
+        val dataSourceFactory = getDataSourceFactory()
+
+        if (!uri.toString().startsWith("rtmp://")){
+            var mimeType = if (uri.toString().startsWith("rtp://") || uri.toString().startsWith("rtsp://")) {
+                MimeTypes.APPLICATION_RTSP
+            } else {
+                null
+            }
+            if(mimeType == null){
+                mimeType = when(Util.inferContentType(uri)){
+                    C.CONTENT_TYPE_HLS -> MimeTypes.APPLICATION_M3U8
+                    C.CONTENT_TYPE_SS -> MimeTypes.APPLICATION_SS
+                    C.CONTENT_TYPE_RTSP -> MimeTypes.APPLICATION_RTSP
+                    else -> null
+                }
+            }
+            if (mimeType != null) {
+                val mediaItem = MediaItem.Builder().setUri(uri)
+                                        .setMimeType(mimeType)
+                                        .build()
+                val mediaSource = DefaultMediaSourceFactory(context)
+                            .setDataSourceFactory(dataSourceFactory)
+                            .createMediaSource(mediaItem)
+                if (mediaSource != null) {
+                    return mediaSource
+                }
+            }
+        }
 
         var contentTypeForce = contentType
 
-        if (uri.toString().startsWith("rtp://")) {
-            contentTypeForce = C.CONTENT_TYPE_RTSP
+        if (contentTypeForce == null){
+            if (uri.toString().startsWith("rtp://") || uri.toString().startsWith("rtsp://")) {
+                contentTypeForce = C.CONTENT_TYPE_RTSP
+            }
+
+            if (currentChannelLine.manifestType == "mpd") {
+                contentTypeForce = C.CONTENT_TYPE_DASH
+            }
+
+            if (uri.toString().startsWith("rtmp://")){
+                contentTypeForce = C.CONTENT_TYPE_OTHER
+            }
         }
 
-        if (currentChannelLine.manifestType == "mpd") {
-            contentTypeForce = C.CONTENT_TYPE_DASH
-        }
 
-        val dataSourceFactory = getDataSourceFactory()
+
+
         return when (contentTypeForce ?: Util.inferContentType(uri)) {
             C.CONTENT_TYPE_HLS -> {
-                HlsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
+                HlsMediaSource.Factory(dataSourceFactory)
+                    .apply{
+                        setAllowChunklessPreparation(true)
+                    }
+                    .createMediaSource(mediaItem)
             }
 
             C.CONTENT_TYPE_DASH -> {
@@ -201,9 +271,17 @@ class Media3VideoPlayer(
             }
 
             C.CONTENT_TYPE_OTHER -> {
-                ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
+                if (uri.toString().startsWith("rtmp://")) {
+                    ProgressiveMediaSource.Factory(RtmpDataSource.Factory()).createMediaSource(mediaItem)
+                }
+                else{
+                    ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
+                }
             }
 
+            C.CONTENT_TYPE_SS -> {
+                SsMediaSource.Factory(dataSourceFactory).createMediaSource(mediaItem)
+            }
             else -> {
                 triggerError(PlaybackException.UNSUPPORTED_TYPE)
                 null
@@ -214,7 +292,6 @@ class Media3VideoPlayer(
     private fun prepare(contentType: Int? = null) {
         val uri = Uri.parse(currentChannelLine.playableUrl)
         val mediaSource = getMediaSource(contentType)
-
         if (mediaSource != null) {
             contentTypeAttempts[contentType ?: Util.inferContentType(uri)] = true
             videoPlayer.setMediaSource(mediaSource)
@@ -252,7 +329,9 @@ class Media3VideoPlayer(
                             prepare(C.CONTENT_TYPE_RTSP)
                         } else if (contentTypeAttempts[C.CONTENT_TYPE_OTHER] != true) {
                             prepare(C.CONTENT_TYPE_OTHER)
-                        } else {
+                        } else if(contentTypeAttempts[C.CONTENT_TYPE_SS] != true){
+                            prepare(C.CONTENT_TYPE_SS)
+                        }else {
                             triggerError(PlaybackException.UNSUPPORTED_TYPE)
                         }
                     }
@@ -377,6 +456,7 @@ class Media3VideoPlayer(
                 subtitleTracks = subtitleFormats,
                 subtitle = subtitleFormats.firstOrNull { it.isSelected == true },
             )
+
 
             triggerMetadata(metadata)
         }
@@ -577,14 +657,12 @@ class Media3VideoPlayer(
                 .buildUpon()
                 .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, true)
                 .build()
-
             return
         }
-
         videoPlayer.trackSelectionParameters = videoPlayer.trackSelectionParameters
             .buildUpon()
             .setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false)
-            .setPreferredTextLanguages(track.language)
+            .setPreferredTextLanguage(track.language)
             .build()
     }
 

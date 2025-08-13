@@ -168,7 +168,7 @@ private fun LiveChannelsChannelInfoTags(
             Tag("时移", colors = tagColors)
         }
 
-        if (currentPlaybackEpgProgramme != null) {
+        if (line.playbackType != null || currentPlaybackEpgProgramme != null) {
             Tag("回放", colors = tagColors)
         }
 
@@ -176,7 +176,7 @@ private fun LiveChannelsChannelInfoTags(
             Tag("${channelLineIdx + 1}/${channel.lineList.size}", colors = tagColors)
         }
 
-        if (line.url.startsWith("webview://")) {
+        if (line.hybridType == ChannelLine.HybridType.WebView) {
             Tag(ChannelUtil.getHybridWebViewUrlProvider(line.url), colors = tagColors)
         } else {
             if (line.url.isIPv6()) Tag("IPv6", colors = tagColors)

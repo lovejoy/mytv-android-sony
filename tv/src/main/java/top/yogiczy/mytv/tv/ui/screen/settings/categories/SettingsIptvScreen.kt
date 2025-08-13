@@ -35,7 +35,7 @@ fun SettingsIptvScreen(
 ) {
     SettingsCategoryScreen(
         modifier = modifier,
-        header = { Text("设置 / 直播源") },
+        header = { Text("设置 / 播放源") },
         onBackPressed = onBackPressed,
     ) { firstItemFocusRequester ->
         item {
@@ -49,12 +49,14 @@ fun SettingsIptvScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Tag(
-                            if (currentIptvSource.isLocal) "本地" else "远程",
-                            colors = TagDefaults.colors(
-                                containerColor = LocalContentColor.current.copy(0.1f)
-                            ),
-                        )
+                        if (!currentIptvSource.name.isNullOrEmpty()) {
+                            Tag(
+                                if (currentIptvSource.isLocal) "本地" else "远程",
+                                colors = TagDefaults.colors(
+                                    containerColor = LocalContentColor.current.copy(0.1f)
+                                ),
+                            )
+                        }
                         Text(currentIptvSource.name)
                     }
                 },
@@ -133,7 +135,7 @@ fun SettingsIptvScreen(
         item {
             SettingsListItem(
                 headlineContent = "频道图标覆盖",
-                supportingContent = "使用频道图标提供覆盖直播源中定义的频道图标",
+                supportingContent = "使用频道图标提供覆盖播放源中定义的频道图标",
                 trailingContent = {
                     Switch(settingsViewModel.iptvChannelLogoOverride, null)
                 },
@@ -145,13 +147,36 @@ fun SettingsIptvScreen(
         }
 
         item {
+            SettingsListItem(
+                headlineContent = "PLTV转TVOD",
+                supportingContent = "自动将播放源链接中的PLTV替换为TVOD以支持回看",
+                trailingContent = {
+                    Switch(settingsViewModel.iptvPLTVToTVOD, null)
+                },
+                onSelect = {
+                    settingsViewModel.iptvPLTVToTVOD =
+                        !settingsViewModel.iptvPLTVToTVOD
+                },
+            )
+        }
+
+        item {
             val hybridMode = settingsViewModel.iptvHybridMode
 
             SettingsListItem(
-                headlineContent = "混合模式",
+                headlineContent = "网页源",
                 trailingContent = { Text(hybridMode.label) },
                 onSelect = toIptvHybridModeScreen,
                 link = true,
+            )
+        }
+
+        item {
+            SettingsListItem(
+                headlineContent = "网页源央视频Cookie",
+                supportingContent = "登录到央视频以收看付费频道",
+                trailingContent = settingsViewModel.iptvHybridYangshipinCookie.take(50)+"...",
+                remoteConfig = true,
             )
         }
     }

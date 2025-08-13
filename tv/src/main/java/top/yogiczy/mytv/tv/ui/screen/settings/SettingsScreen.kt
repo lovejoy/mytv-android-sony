@@ -1,5 +1,6 @@
 package top.yogiczy.mytv.tv.ui.screen.settings
 
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsNetworkRetryIntervalScreen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -13,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import top.yogiczy.mytv.core.data.utils.Constants
 import top.yogiczy.mytv.core.data.entities.channel.Channel
 import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList
 import top.yogiczy.mytv.core.data.entities.epgsource.EpgSourceList
@@ -41,14 +43,18 @@ import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsEpgSourceScr
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvHybridModeScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvSourceCacheTimeScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvSourceScreen
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsNetworkRetryCountScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiDensityScaleRatioScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiFontScaleRatioScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiScreenAutoCloseScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiTimeShowModeScreen
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiVideoPlayerSubtitleSettingsScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUpdateChannelScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerCoreScreen
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsWebViewCoreScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerDisplayModeScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerLoadTimeoutScreen
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerBufferTimeScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerRenderModeScreen
 import top.yogiczy.mytv.tv.ui.utils.navigateSingleTop
 
@@ -137,6 +143,22 @@ fun SettingsScreen(
                         toUiFontScaleRatioScreen = {
                             navController.navigateSingleTop(SettingsSubCategories.UI_FONT_SCALE_RATIO.name)
                         },
+                        toUiVideoPlayerSubtitleSettingsScreen = {
+                            navController.navigateSingleTop(SettingsSubCategories.UI_VIDEO_PLAYER_SUBTITLE.name)
+                        },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
+                composable(SettingsCategories.NETWORK.name) {
+                    SettingsNetworkScreen(
+                        settingsViewModel = settingsViewModel,
+                        toNetworkRetryCountScreen = {
+                            navController.navigateSingleTop(SettingsSubCategories.NETWORK_RETRY_COUNT.name)
+                        },
+                        toNetworkRetryIntervalScreen = {
+                            navController.navigateSingleTop(SettingsSubCategories.NETWORK_RETRY_INTERVAL.name)
+                        },
                         onBackPressed = { navController.navigateUp() },
                     )
                 }
@@ -152,6 +174,9 @@ fun SettingsScreen(
                         toVideoPlayerCoreScreen = {
                             navController.navigateSingleTop(SettingsSubCategories.VIDEO_PLAYER_CORE.name)
                         },
+                        toWebviewCoreScreen = {
+                            navController.navigateSingleTop(SettingsSubCategories.WEBVIEW_CORE.name)
+                        },
                         toVideoPlayerRenderModeScreen = {
                             navController.navigateSingleTop(SettingsSubCategories.VIDEO_PLAYER_RENDER_MODE.name)
                         },
@@ -160,6 +185,9 @@ fun SettingsScreen(
                         },
                         toVideoPlayerLoadTimeoutScreen = {
                             navController.navigateSingleTop(SettingsSubCategories.VIDEO_PLAYER_LOAD_TIMEOUT.name)
+                        },
+                        toVideoPlayerBufferTimeScreen = {
+                            navController.navigateSingleTop(SettingsSubCategories.VIDEO_PLAYER_BUFFER_TIME.name)
                         },
                         onBackPressed = { navController.navigateUp() },
                     )
@@ -170,12 +198,6 @@ fun SettingsScreen(
                         toUpdateChannelScreen = {
                             navController.navigateSingleTop(SettingsSubCategories.UPDATE_CHANNEL.name)
                         },
-                        onBackPressed = { navController.navigateUp() },
-                    )
-                }
-
-                composable(SettingsCategories.NETWORK.name) {
-                    SettingsNetworkScreen(
                         onBackPressed = { navController.navigateUp() },
                     )
                 }
@@ -217,7 +239,7 @@ fun SettingsScreen(
                 composable(SettingsSubCategories.IPTV_SOURCE.name) {
                     SettingsIptvSourceScreen(
                         currentIptvSourceProvider = { settingsViewModel.iptvSourceCurrent },
-                        iptvSourceListProvider = { settingsViewModel.iptvSourceList },
+                        iptvSourceListProvider = { IptvSourceList(Constants.IPTV_SOURCE_LIST + settingsViewModel.iptvSourceList) },
                         onSetCurrent = {
                             settingsViewModel.iptvSourceCurrent = it
                             settingsViewModel.iptvChannelGroupHiddenList = emptySet()
@@ -346,11 +368,55 @@ fun SettingsScreen(
                     )
                 }
 
+                composable(SettingsSubCategories.UI_VIDEO_PLAYER_SUBTITLE.name) {
+                    SettingsUiVideoPlayerSubtitleSettingsScreen(
+                        subtitleSettingsProvider = { settingsViewModel.uiVideoPlayerSubtitle },
+                        onSubtitleSettingsChanged = {
+                            settingsViewModel.uiVideoPlayerSubtitle = it
+                            // navController.navigateUp()
+                        },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
+                composable(SettingsSubCategories.NETWORK_RETRY_COUNT.name) {
+                    SettingsNetworkRetryCountScreen(
+                        countProvider = { settingsViewModel.networkRetryCount },
+                        onCountChanged = { count ->
+                            settingsViewModel.networkRetryCount = count
+                            navController.navigateUp()
+                        },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
+                composable(SettingsSubCategories.NETWORK_RETRY_INTERVAL.name) {
+                    SettingsNetworkRetryIntervalScreen(
+                        intervalProvider = { settingsViewModel.networkRetryInterval },
+                        onIntervalChanged = { interval ->
+                            settingsViewModel.networkRetryInterval = interval
+                            navController.navigateUp()
+                        },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
                 composable(SettingsSubCategories.VIDEO_PLAYER_CORE.name) {
                     SettingsVideoPlayerCoreScreen(
                         coreProvider = { settingsViewModel.videoPlayerCore },
                         onCoreChanged = {
                             settingsViewModel.videoPlayerCore = it
+                            navController.navigateUp()
+                        },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
+                composable(SettingsSubCategories.WEBVIEW_CORE.name) {
+                    SettingsWebViewCoreScreen(
+                        coreProvider = { settingsViewModel.webViewCore },
+                        onCoreChanged = {
+                            settingsViewModel.webViewCore = it
                             navController.navigateUp()
                         },
                         onBackPressed = { navController.navigateUp() },
@@ -390,6 +456,17 @@ fun SettingsScreen(
                     )
                 }
 
+                composable(SettingsSubCategories.VIDEO_PLAYER_BUFFER_TIME.name) {
+                    SettingsVideoPlayerBufferTimeScreen(
+                        bufferTimeProvider = { settingsViewModel.videoPlayerBufferTime },
+                        onBufferTimeChanged = {
+                            settingsViewModel.videoPlayerBufferTime = it
+                            navController.navigateUp()
+                        },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+                
                 composable(SettingsSubCategories.UPDATE_CHANNEL.name) {
                     SettingsUpdateChannelScreen(
                         updateChannelProvider = { settingsViewModel.updateChannel },
