@@ -42,6 +42,22 @@ fun SettingsUpdateScreen(
         }
 
         item {
+            val autoCheck = settingsViewModel.updateAutoCheck
+
+            SettingsListItem(
+                headlineContent = "启动时自动检查更新",
+                supportingContent = if (autoCheck) "程序启动时会自动检查更新"
+                else "程序启动时不检查更新",
+                trailingContent = {
+                    Switch(autoCheck, null)
+                },
+                onSelect = {
+                    settingsViewModel.updateAutoCheck = !autoCheck
+                },
+            )
+        }
+
+        item {
             val forceRemind = settingsViewModel.updateForceRemind
 
             SettingsListItem(

@@ -158,7 +158,9 @@ fun MainScreen(
                     toDashboardScreen = {
                         navController.navigateUp()
                         navController.navigateSingleTop(settingsViewModel.appStartupScreen)
-                        checkUpdate()
+                        if (settingsViewModel.updateAutoCheck) {
+                            checkUpdate()
+                        }
                     },
                     toSettingsScreen = { navController.navigateSingleTop(Screens.Settings()) },
                     onBackPressed = onBackPressed,

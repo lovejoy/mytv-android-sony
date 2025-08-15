@@ -174,6 +174,9 @@ object Configs {
         /** 更新强提醒 */
         UPDATE_FORCE_REMIND,
 
+        /** 启动时自动检查更新 */
+        UPDATE_AUTO_CHECK,
+
         /** 更新通道 */
         UPDATE_CHANNEL,
 
@@ -552,6 +555,11 @@ object Configs {
     var updateForceRemind: Boolean
         get() = SP.getBoolean(KEY.UPDATE_FORCE_REMIND.name, false)
         set(value) = SP.putBoolean(KEY.UPDATE_FORCE_REMIND.name, value)
+
+    /** 启动时自动检查更新 */
+    var updateAutoCheck: Boolean
+        get() = SP.getBoolean(KEY.UPDATE_AUTO_CHECK.name, true)
+        set(value) = SP.putBoolean(KEY.UPDATE_AUTO_CHECK.name, value)
 
     /** 更新通道 */
     var updateChannel: String

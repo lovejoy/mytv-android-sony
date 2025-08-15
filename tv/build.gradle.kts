@@ -2,6 +2,28 @@ import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import java.io.FileInputStream
 import java.util.Properties
 
+// 获取 Git 提交次数作为 versionCode
+fun getGitCommitCount(): String {
+    return try {
+        val process = Runtime.getRuntime().exec("git rev-list --count HEAD")
+        process.waitFor()
+        process.inputStream.bufferedReader().readLine() ?: "1"
+    } catch (e: Exception) {
+        "1"
+    }
+}
+
+// 获取 Git 提交的短哈希
+fun getGitCommitHash(): String {
+    return try {
+        val process = Runtime.getRuntime().exec("git rev-parse --short HEAD")
+        process.waitFor()
+        process.inputStream.bufferedReader().readLine() ?: "unknown"
+    } catch (e: Exception) {
+        "unknown"
+    }
+}
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,11 +40,11 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "top.yogiczy.slcs.tv"
+        applicationId = "top.yogiczy.slcs.sonytv"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = (System.getenv("VERSION_CODE") ?: "2").toInt()
-        versionName = System.getenv("VERSION_NAME") ?: "3.3.9"
+        versionCode = (System.getenv("VERSION_CODE") ?: getGitCommitCount()).toInt()
+        versionName = System.getenv("VERSION_NAME") ?: "3.3.9.${getGitCommitHash()}"
         vectorDrawables {
             useSupportLibrary = true
         }

@@ -456,6 +456,15 @@ class SettingsViewModel : ViewModel() {
             afterSetWhenCloudSyncAutoPull()
         }
 
+    private var _updateAutoCheck by mutableStateOf(false)
+    var updateAutoCheck: Boolean
+        get() = _updateAutoCheck
+        set(value) {
+            _updateAutoCheck = value
+            Configs.updateAutoCheck = value
+            afterSetWhenCloudSyncAutoPull()
+        }
+
     private var _updateChannel by mutableStateOf("")
     var updateChannel: String
         get() = _updateChannel
@@ -763,6 +772,7 @@ class SettingsViewModel : ViewModel() {
         _uiFocusOptimize = Configs.uiFocusOptimize
         _uiScreenAutoCloseDelay = Configs.uiScreenAutoCloseDelay
         _updateForceRemind = Configs.updateForceRemind
+        _updateAutoCheck = Configs.updateAutoCheck
         _updateChannel = Configs.updateChannel
         _videoPlayerCore = Configs.videoPlayerCore
         _webViewCore = Configs.webViewCore

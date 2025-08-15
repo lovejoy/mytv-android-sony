@@ -35,7 +35,10 @@ fun String.isIPv6(): Boolean {
 fun String.compareVersion(version2: String): Int {
     fun parseVersion(version: String): Pair<List<Int>, String?> {
         val mainParts = version.split("-", limit = 2)
-        val versionNumbers = mainParts[0].split(".").map { it.toInt() }
+        val versionNumbers = mainParts[0].split(".").map { part ->
+            // 安全地将版本号部分转换为数字，如果包含非数字字符则返回0
+            part.toIntOrNull() ?: 0
+        }
         val preReleaseLabel = mainParts.getOrNull(1)
         return versionNumbers to preReleaseLabel
     }
