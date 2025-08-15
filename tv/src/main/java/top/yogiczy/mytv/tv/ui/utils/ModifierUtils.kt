@@ -187,6 +187,7 @@ fun Modifier.handleKeyEvents(
     onLongSelect: (() -> Unit)? = null,
     onSettings: (() -> Unit)? = null,
     onNumber: ((Int) -> Unit)? = null,
+    onInfo: (() -> Unit)? = null,
 ) = handleKeyEvents(
     onKeyTap = mapOf(
         KeyEvent.KEYCODE_DPAD_LEFT to onLeft,
@@ -210,6 +211,8 @@ fun Modifier.handleKeyEvents(
         KeyEvent.KEYCODE_S to onLongDown,
         KeyEvent.KEYCODE_A to onLongLeft,
         KeyEvent.KEYCODE_D to onLongRight,
+
+        KeyEvent.KEYCODE_INFO to onInfo,
 
         KeyEvent.KEYCODE_0 to onNumber?.let<(Int) -> Unit, () -> Unit> { { it(0) } },
         KeyEvent.KEYCODE_1 to onNumber?.let<(Int) -> Unit, () -> Unit> { { it(1) } },
@@ -263,6 +266,7 @@ fun Modifier.handleKeyEvents(
     onLongSelect: (() -> Unit)? = null,
     onSettings: (() -> Unit)? = null,
     onNumber: ((Int) -> Unit)? = null,
+    onInfo: (() -> Unit)? = null,
 ) = handleKeyEvents(
     onLeft = onLeft?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
     onLongLeft = onLongLeft?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
@@ -276,6 +280,7 @@ fun Modifier.handleKeyEvents(
     onLongSelect = onLongSelect?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
     onSettings = onSettings?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
     onNumber = onNumber?.let { { num -> if (isFocused()) it(num) else focusRequester.saveRequestFocus() } },
+    onInfo = onInfo?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
 )
 
 fun Modifier.backHandler(onBackPressed: () -> Unit) = this.onPreviewKeyEvent {

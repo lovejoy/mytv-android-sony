@@ -131,6 +131,11 @@ fun MainContent(
                 onLongRight = { mainContentState.isChannelLineScreenVisible = true },
                 onLongDown = { mainContentState.isVideoPlayerControllerScreenVisible = true },
                 onNumber = { channelNumberSelectState.input(it) },
+                onInfo = { 
+                    log.i("收到INFO按键，当前状态: ${settingsViewModel.debugShowVideoPlayerMetadata}")
+                    settingsViewModel.debugShowVideoPlayerMetadata = !settingsViewModel.debugShowVideoPlayerMetadata
+                    log.i("切换后状态: ${settingsViewModel.debugShowVideoPlayerMetadata}")
+                },
             )
             .handleDragGestures(
                 onSwipeDown = {
