@@ -27,3 +27,4 @@ key.properties
 keystore.jks
 .kotlin
 /release
+/.claude/settings.local.json
