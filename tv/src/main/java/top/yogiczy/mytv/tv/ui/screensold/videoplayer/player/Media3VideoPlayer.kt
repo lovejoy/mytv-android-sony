@@ -190,9 +190,8 @@ class Media3VideoPlayer(
                 val mediaSource = DefaultMediaSourceFactory(context)
                             .setDataSourceFactory(dataSourceFactory)
                             .createMediaSource(mediaItem)
-                if (mediaSource != null) {
-                    return mediaSource
-                }
+                return mediaSource
+
             }
         }
 
@@ -347,6 +346,7 @@ class Media3VideoPlayer(
                         )
                     } else {
                         softDecode = true
+                        logger.i("解析失败，切换到软解")
                         reInitPlayer()
                     }
                 }
