@@ -32,7 +32,7 @@ fun SettingsIptvHybridModeScreen(
 
     AppScreen(
         modifier = modifier.padding(top = 10.dp),
-        header = { Text("设置 / 播放源 / 网页源") },
+        header = { Text("设置 / 播放源 / 自动追加内置网页源") },
         canBack = true,
         onBackPressed = onBackPressed,
     ) {
