@@ -64,6 +64,7 @@ fun QuickOpBtnList(
     onShowVideoTracks: () -> Unit = {},
     onShowAudioTracks: () -> Unit = {},
     onShowSubtitleTracks: () -> Unit = {},
+    onShowVideoPlayerCore: () -> Unit = {},
     onShowMoreSettings: () -> Unit = {},
     onShowDashboardScreen: () -> Unit = {},
     onClearCache: () -> Unit = {},
@@ -144,12 +145,7 @@ fun QuickOpBtnList(
                 QuickOpBtn(
                     title = "播放器："+settingsViewModel.videoPlayerCore.label,
                     imageVector = Icons.Filled.SmartDisplay,
-                    onSelect = {
-                        settingsViewModel.videoPlayerCore = when (settingsViewModel.videoPlayerCore) {
-                            Configs.VideoPlayerCore.MEDIA3 -> Configs.VideoPlayerCore.IJK
-                            Configs.VideoPlayerCore.IJK -> Configs.VideoPlayerCore.MEDIA3
-                        }
-                    },
+                    onSelect = onShowVideoPlayerCore,
                 )
             }
 

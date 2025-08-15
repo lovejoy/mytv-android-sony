@@ -57,6 +57,7 @@ import top.yogiczy.mytv.tv.ui.screensold.videoplayer.rememberVideoPlayerState
 import top.yogiczy.mytv.tv.ui.screensold.videoplayercontroller.VideoPlayerControllerScreen
 import top.yogiczy.mytv.tv.ui.screensold.videoplayerdiaplaymode.VideoPlayerDisplayModeScreen
 import top.yogiczy.mytv.tv.ui.screensold.videotracks.VideoTracksScreen
+import top.yogiczy.mytv.tv.ui.screensold.videoplayercore.VideoPlayerCoreScreen
 import top.yogiczy.mytv.tv.ui.screensold.webview.WebViewScreen
 import top.yogiczy.mytv.tv.ui.screensold.webview.WebViewScreen_X5
 import top.yogiczy.mytv.tv.ui.utils.backHandler
@@ -439,6 +440,20 @@ fun MainContent(
     }
 
     PopupContent(
+        visibleProvider = { mainContentState.isVideoPlayerCoreScreenVisible },
+        onDismissRequest = { mainContentState.isVideoPlayerCoreScreenVisible = false },
+    ) {
+        VideoPlayerCoreScreen(
+            currentCoreProvider = { settingsViewModel.videoPlayerCore },
+            onCoreChanged = {
+                settingsViewModel.videoPlayerCore = it
+                mainContentState.isVideoPlayerCoreScreenVisible = false
+            },
+            onClose = { mainContentState.isVideoPlayerCoreScreenVisible = false },
+        )
+    }
+
+    PopupContent(
         visibleProvider = { mainContentState.isQuickOpScreenVisible },
         onDismissRequest = { mainContentState.isQuickOpScreenVisible = false },
     ) {
@@ -483,6 +498,10 @@ fun MainContent(
             onShowSubtitleTracks = {
                 mainContentState.isQuickOpScreenVisible = false
                 mainContentState.isSubtitleTracksScreenVisible = true
+            },
+            onShowVideoPlayerCore = {
+                mainContentState.isQuickOpScreenVisible = false
+                mainContentState.isVideoPlayerCoreScreenVisible = true
             },
             toSettingsScreen = {
                 mainContentState.isQuickOpScreenVisible = false

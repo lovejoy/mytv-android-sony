@@ -164,7 +164,7 @@ fun SettingsIptvScreen(
             val hybridMode = settingsViewModel.iptvHybridMode
 
             SettingsListItem(
-                headlineContent = "网页源",
+                headlineContent = "自动追加内置网页源",
                 trailingContent = { Text(hybridMode.label) },
                 onSelect = toIptvHybridModeScreen,
                 link = true,

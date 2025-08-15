@@ -150,6 +150,13 @@ class MainContentState(
             _isSubtitleTracksScreenVisible = value
         }
 
+    private var _isVideoPlayerCoreScreenVisible by mutableStateOf(false)
+    var isVideoPlayerCoreScreenVisible
+        get() = _isVideoPlayerCoreScreenVisible
+        set(value) {
+            _isVideoPlayerCoreScreenVisible = value
+        }
+
     init {
         val channelGroupList = channelGroupListProvider()
 
