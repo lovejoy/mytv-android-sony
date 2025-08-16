@@ -193,6 +193,14 @@ class MainActivity : ComponentActivity() {
                 }
                 return true // 拦截事件，不传递给系统
             }
+            // 帮助按键
+            KeyEvent.KEYCODE_HELP -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Help key intercepted")
+                    handleHelpKey()
+                }
+                return true // 拦截事件，不传递给系统
+            }
             // 调试模式：记录所有未处理的按键，帮助识别USB遥控器的keycode
             else -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
@@ -203,6 +211,20 @@ class MainActivity : ComponentActivity() {
             }
         }
         return super.dispatchKeyEvent(event)
+    }
+    
+    /**
+     * 额外的按键处理，用于处理系统级按键
+     */
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        when (keyCode) {
+            KeyEvent.KEYCODE_HELP -> {
+                Log.d(TAG, "Help key intercepted in onKeyDown")
+                handleHelpKey()
+                return true
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
     
     /**
@@ -237,6 +259,15 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Processing Guide key")
         // 直接模拟GUIDE按键传递给UI层
         simulateKeyPress(KeyEvent.KEYCODE_GUIDE)
+    }
+    
+    /**
+     * 处理帮助按键
+     */
+    private fun handleHelpKey() {
+        Log.d(TAG, "Processing Help key")
+        // 发送广播通知应用跳转到主页
+        sendBroadcast(Intent("top.yogiczy.mytv.tv.SHOW_DASHBOARD"))
     }
     
     /**

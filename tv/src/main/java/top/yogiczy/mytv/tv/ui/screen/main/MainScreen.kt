@@ -91,11 +91,18 @@ fun MainScreen(
                             navController.navigateSingleTop(Screens.EpgGuide())
                         }
                     }
+                    "top.yogiczy.mytv.tv.SHOW_DASHBOARD" -> {
+                        // 跳转到主页
+                        navController.navigateSingleTop(Screens.Dashboard())
+                    }
                 }
             }
         }
         
-        val filter = IntentFilter("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE")
+        val filter = IntentFilter().apply {
+            addAction("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE")
+            addAction("top.yogiczy.mytv.tv.SHOW_DASHBOARD")
+        }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
         } else {
