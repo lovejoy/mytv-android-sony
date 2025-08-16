@@ -185,26 +185,13 @@ class MainActivity : ComponentActivity() {
                 }
                 return true
             }
-            // 处理一些遥控器可能使用的其他按键码
-            166, 167 -> { // KEYCODE_PROG_RED, KEYCODE_PROG_GREEN 有时用于频道切换
-                if (event.action == KeyEvent.ACTION_DOWN) {
-                    if (event.keyCode == 166) { // 红色按键可能映射为频道上
-                        Log.d(TAG, "Prog Red key (Channel Up) intercepted")
-                        handleChannelUp()
-                    } else { // 绿色按键可能映射为频道下  
-                        Log.d(TAG, "Prog Green key (Channel Down) intercepted")
-                        handleChannelDown()
-                    }
-                }
-                return true
-            }
             // EPG节目指南按键
             KeyEvent.KEYCODE_GUIDE -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     Log.d(TAG, "Guide key intercepted")
                     handleGuideKey()
                 }
-                return true
+                return true // 拦截事件，不传递给系统
             }
             // 调试模式：记录所有未处理的按键，帮助识别USB遥控器的keycode
             else -> {
@@ -248,8 +235,8 @@ class MainActivity : ComponentActivity() {
      */
     private fun handleGuideKey() {
         Log.d(TAG, "Processing Guide key")
-        // 发送广播通知应用切换到节目指南或返回直播
-        sendBroadcast(Intent("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE"))
+        // 直接模拟GUIDE按键传递给UI层
+        simulateKeyPress(KeyEvent.KEYCODE_GUIDE)
     }
     
     /**

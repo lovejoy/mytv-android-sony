@@ -80,6 +80,7 @@ fun MainContent(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val log = remember { Logger.create("MainContent")}
+    val context = LocalContext.current
     val videoPlayerState =
         rememberVideoPlayerState(defaultDisplayModeProvider = { settingsViewModel.videoPlayerDisplayMode })
     val mainContentState = rememberMainContentState(
@@ -135,6 +136,9 @@ fun MainContent(
                     log.i("收到INFO按键，当前状态: ${settingsViewModel.debugShowVideoPlayerMetadata}")
                     settingsViewModel.debugShowVideoPlayerMetadata = !settingsViewModel.debugShowVideoPlayerMetadata
                     log.i("切换后状态: ${settingsViewModel.debugShowVideoPlayerMetadata}")
+                },
+                onGuide = { 
+                    mainContentState.isEpgScreenVisible = !mainContentState.isEpgScreenVisible
                 },
             )
             .handleDragGestures(
