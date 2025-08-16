@@ -92,8 +92,15 @@ fun MainScreen(
                         }
                     }
                     "top.yogiczy.mytv.tv.SHOW_DASHBOARD" -> {
-                        // 跳转到主页
-                        navController.navigateSingleTop(Screens.Dashboard())
+                        // F2键切换：Dashboard主页和直播页面之间切换
+                        val currentRoute = navController.currentBackStackEntry?.destination?.route
+                        if (currentRoute == Screens.Dashboard()) {
+                            // 如果当前在Dashboard页面，返回到直播页面
+                            navController.navigateSingleTop(Screens.Live())
+                        } else {
+                            // 如果当前不在Dashboard页面，跳转到Dashboard页面
+                            navController.navigateSingleTop(Screens.Dashboard())
+                        }
                     }
                     "top.yogiczy.mytv.tv.SHOW_EPG_GUIDE_CHANNEL_LIST" -> {
                         // 跳转到全局节目单页面
