@@ -99,6 +99,22 @@ fun MainScreen(
                         // 跳转到全局节目单页面
                         navController.navigateSingleTop(Screens.EpgGuide())
                     }
+                    "top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE_PAGE" -> {
+                        // 切换EPG页面和播放页面
+                        val currentRoute = navController.currentBackStackEntry?.destination?.route
+                        if (currentRoute == Screens.EpgGuide()) {
+                            // 如果当前在EPG页面，返回到直播页面
+                            navController.navigateSingleTop(Screens.Live())
+                        } else {
+                            // 如果当前不在EPG页面，跳转到EPG页面
+                            navController.navigateSingleTop(Screens.EpgGuide())
+                        }
+                    }
+                    "top.yogiczy.mytv.tv.TOGGLE_AUDIO_TRACKS" -> {
+                        // 切换音轨页面
+                        // 这个需要通过其他方式处理，因为音轨状态在MainContent中
+                        // 我们可以发送一个特殊的按键事件来触发
+                    }
                 }
             }
         }
@@ -107,6 +123,8 @@ fun MainScreen(
             addAction("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE")
             addAction("top.yogiczy.mytv.tv.SHOW_DASHBOARD")
             addAction("top.yogiczy.mytv.tv.SHOW_EPG_GUIDE_CHANNEL_LIST")
+            addAction("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE_PAGE")
+            addAction("top.yogiczy.mytv.tv.TOGGLE_AUDIO_TRACKS")
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)

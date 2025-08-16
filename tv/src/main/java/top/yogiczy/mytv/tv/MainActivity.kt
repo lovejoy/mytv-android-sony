@@ -209,6 +209,14 @@ class MainActivity : ComponentActivity() {
                 }
                 return true // 拦截事件，不传递给系统
             }
+            // 音轨按键
+            KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Media Audio Track key intercepted")
+                    handleAudioTrackKey()
+                }
+                return true // 拦截事件，不传递给系统
+            }
             // 调试模式：记录所有未处理的按键，帮助识别USB遥控器的keycode
             else -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
@@ -229,6 +237,16 @@ class MainActivity : ComponentActivity() {
             KeyEvent.KEYCODE_HELP -> {
                 Log.d(TAG, "Help key intercepted in onKeyDown")
                 handleHelpKey()
+                return true
+            }
+            KeyEvent.KEYCODE_LAST_CHANNEL -> {
+                Log.d(TAG, "Last Channel key intercepted in onKeyDown")
+                handleLastChannelKey()
+                return true
+            }
+            KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK -> {
+                Log.d(TAG, "Media Audio Track key intercepted in onKeyDown")
+                handleAudioTrackKey()
                 return true
             }
         }
@@ -276,6 +294,10 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Processing Help key")
         // 发送广播通知应用跳转到主页
         sendBroadcast(Intent("top.yogiczy.mytv.tv.SHOW_DASHBOARD"))
+        
+        // 也可以通过其他方式触发跳转，比如模拟按键
+        // 这里模拟发送MENU按键，让现有的按键处理逻辑来处理
+        simulateKeyPress(KeyEvent.KEYCODE_MENU)
     }
     
     /**
@@ -283,8 +305,17 @@ class MainActivity : ComponentActivity() {
      */
     private fun handleLastChannelKey() {
         Log.d(TAG, "Processing Last Channel key")
-        // 发送广播通知应用跳转到全局节目单页面
-        sendBroadcast(Intent("top.yogiczy.mytv.tv.SHOW_EPG_GUIDE_CHANNEL_LIST"))
+        // 发送广播通知应用切换EPG页面
+        sendBroadcast(Intent("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE_PAGE"))
+    }
+    
+    /**
+     * 处理音轨按键
+     */
+    private fun handleAudioTrackKey() {
+        Log.d(TAG, "Processing Audio Track key")
+        // 发送广播通知应用切换音轨页面
+        sendBroadcast(Intent("top.yogiczy.mytv.tv.TOGGLE_AUDIO_TRACKS"))
     }
     
     /**

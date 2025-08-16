@@ -2,6 +2,7 @@ package top.yogiczy.mytv.tv.ui.screensold.main.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -10,6 +11,8 @@ import kotlinx.coroutines.launch
 import android.widget.Toast
 import android.content.Context
 import android.content.Intent
+import android.content.BroadcastReceiver
+import android.content.IntentFilter
 import androidx.compose.runtime.remember
 
 import top.yogiczy.mytv.core.data.utils.Constants
@@ -95,6 +98,30 @@ fun MainContent(
         }
     }
 
+    // 监听音轨切换广播
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                when (intent.action) {
+                    "top.yogiczy.mytv.tv.TOGGLE_AUDIO_TRACKS" -> {
+                        mainContentState.isAudioTracksScreenVisible = !mainContentState.isAudioTracksScreenVisible
+                    }
+                }
+            }
+        }
+        
+        val filter = IntentFilter("top.yogiczy.mytv.tv.TOGGLE_AUDIO_TRACKS")
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            context.registerReceiver(receiver, filter)
+        }
+        
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
+
     Box(
         modifier = modifier
             .popupable()
@@ -139,6 +166,9 @@ fun MainContent(
                 },
                 onGuide = { 
                     mainContentState.isEpgScreenVisible = !mainContentState.isEpgScreenVisible
+                },
+                onAudioTrack = {
+                    mainContentState.isAudioTracksScreenVisible = !mainContentState.isAudioTracksScreenVisible
                 },
             )
             .handleDragGestures(
