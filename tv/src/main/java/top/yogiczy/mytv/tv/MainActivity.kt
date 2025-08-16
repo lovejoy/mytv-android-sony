@@ -201,6 +201,14 @@ class MainActivity : ComponentActivity() {
                 }
                 return true // 拦截事件，不传递给系统
             }
+            // 回看按键
+            KeyEvent.KEYCODE_LAST_CHANNEL -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Last Channel key intercepted")
+                    handleLastChannelKey()
+                }
+                return true // 拦截事件，不传递给系统
+            }
             // 调试模式：记录所有未处理的按键，帮助识别USB遥控器的keycode
             else -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
@@ -268,6 +276,15 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Processing Help key")
         // 发送广播通知应用跳转到主页
         sendBroadcast(Intent("top.yogiczy.mytv.tv.SHOW_DASHBOARD"))
+    }
+    
+    /**
+     * 处理回看按键
+     */
+    private fun handleLastChannelKey() {
+        Log.d(TAG, "Processing Last Channel key")
+        // 发送广播通知应用跳转到全局节目单页面
+        sendBroadcast(Intent("top.yogiczy.mytv.tv.SHOW_EPG_GUIDE_CHANNEL_LIST"))
     }
     
     /**
