@@ -17,6 +17,7 @@ enum class Screens(
     About,
     Update,
     MultiView,
+    EpgGuide,
     ;
 
     operator fun invoke(): String {

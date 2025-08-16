@@ -1,11 +1,17 @@
 package top.yogiczy.mytv.tv.ui.screen.main
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -50,6 +56,7 @@ fun MainScreen(
     mainViewModel: MainViewModel = mainVM,
     onBackPressed: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val uiState by mainViewModel.uiState.collectAsState()
 
@@ -67,6 +74,38 @@ fun MainScreen(
     }
 
     val navController = rememberNavController()
+
+    // 处理EPG指南按键广播
+    DisposableEffect(navController) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                when (intent.action) {
+                    "top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE" -> {
+                        // 获取当前路由
+                        val currentRoute = navController.currentBackStackEntry?.destination?.route
+                        if (currentRoute == Screens.EpgGuide()) {
+                            // 如果当前在EPG指南页面，返回到直播页面
+                            navController.navigateSingleTop(Screens.Live())
+                        } else {
+                            // 如果当前不在EPG指南页面，跳转到EPG指南
+                            navController.navigateSingleTop(Screens.EpgGuide())
+                        }
+                    }
+                }
+            }
+        }
+        
+        val filter = IntentFilter("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE")
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            context.registerReceiver(receiver, filter)
+        }
+        
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
 
     fun onChannelSelected(channel: Channel) {
         settingsViewModel.iptvChannelLastPlay = channel
@@ -181,6 +220,7 @@ fun MainScreen(
                     toPushScreen = { navController.navigateSingleTop(Screens.Push()) },
                     toSettingsScreen = { navController.navigateSingleTop(Screens.Settings()) },
                     toAboutScreen = { navController.navigateSingleTop(Screens.About()) },
+                    toEpgGuideScreen = { navController.navigateSingleTop(Screens.EpgGuide()) },
                     toSettingsIptvSourceScreen = {
                         navController.navigateSingleTop(
                             Screens.Settings.withArgs(SettingsSubCategories.IPTV_SOURCE)
@@ -254,6 +294,15 @@ fun MainScreen(
                     onChannelSelected = { onChannelSelected(it) },
                     onChannelFavoriteToggle = { onChannelFavoriteToggle(it) },
                     epgListProvider = epgListProvider,
+                    onBackPressed = { navController.navigateUp() },
+                )
+            }
+
+            composable(Screens.EpgGuide()) {
+                top.yogiczy.mytv.tv.ui.screen.epgguide.EpgGuideScreen(
+                    channelGroupListProvider = filteredChannelGroupListProvider,
+                    epgListProvider = epgListProvider,
+                    onChannelSelected = { onChannelSelected(it) },
                     onBackPressed = { navController.navigateUp() },
                 )
             }

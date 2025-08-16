@@ -198,6 +198,14 @@ class MainActivity : ComponentActivity() {
                 }
                 return true
             }
+            // EPG节目指南按键
+            KeyEvent.KEYCODE_GUIDE -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "Guide key intercepted")
+                    handleGuideKey()
+                }
+                return true
+            }
             // 调试模式：记录所有未处理的按键，帮助识别USB遥控器的keycode
             else -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
@@ -233,6 +241,15 @@ class MainActivity : ComponentActivity() {
         
         // 模拟发送DPAD_DOWN按键，让现有的按键处理逻辑来处理
         simulateKeyPress(KeyEvent.KEYCODE_DPAD_DOWN)
+    }
+    
+    /**
+     * 处理EPG指南按键
+     */
+    private fun handleGuideKey() {
+        Log.d(TAG, "Processing Guide key")
+        // 发送广播通知应用切换到节目指南或返回直播
+        sendBroadcast(Intent("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE"))
     }
     
     /**

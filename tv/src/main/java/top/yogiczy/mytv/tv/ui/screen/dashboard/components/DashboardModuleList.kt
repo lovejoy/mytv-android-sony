@@ -9,6 +9,7 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InsertChart
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Tv
@@ -35,6 +36,7 @@ fun DashboardModuleList(
     toPushScreen: () -> Unit = {},
     toSettingsScreen: () -> Unit = {},
     toAboutScreen: () -> Unit = {},
+    toEpgGuideScreen: () -> Unit = {},
 ) {
     val childPadding = rememberChildPadding()
 
@@ -59,6 +61,14 @@ fun DashboardModuleList(
                 imageVector = Icons.Outlined.GridView,
                 title = "全部频道",
                 onSelected = toChannelsScreen,
+            )
+        }
+
+        item {
+            DashboardModuleItem(
+                imageVector = Icons.Outlined.Schedule,
+                title = "节目指南",
+                onSelected = toEpgGuideScreen,
             )
         }
 

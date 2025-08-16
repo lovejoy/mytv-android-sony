@@ -60,6 +60,7 @@ fun DashboardScreen(
     toPushScreen: () -> Unit = {},
     toSettingsScreen: () -> Unit = {},
     toAboutScreen: () -> Unit = {},
+    toEpgGuideScreen: () -> Unit = {},
     toSettingsIptvSourceScreen: () -> Unit = {},
     onReload: () -> Unit = {},
     onBackPressed: () -> Unit = {},
@@ -99,6 +100,7 @@ fun DashboardScreen(
                     toPushScreen = toPushScreen,
                     toSettingsScreen = toSettingsScreen,
                     toAboutScreen = toAboutScreen,
+                    toEpgGuideScreen = toEpgGuideScreen,
                 )
             }
 
