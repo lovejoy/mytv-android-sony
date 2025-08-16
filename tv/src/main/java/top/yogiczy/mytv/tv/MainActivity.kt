@@ -193,14 +193,6 @@ class MainActivity : ComponentActivity() {
                 }
                 return true // 拦截事件，不传递给系统
             }
-            // 帮助按键
-            KeyEvent.KEYCODE_HELP -> {
-                if (event.action == KeyEvent.ACTION_DOWN) {
-                    Log.d(TAG, "Help key intercepted")
-                    handleHelpKey()
-                }
-                return true // 拦截事件，不传递给系统
-            }
             // 回看按键
             KeyEvent.KEYCODE_LAST_CHANNEL -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
@@ -234,11 +226,6 @@ class MainActivity : ComponentActivity() {
      */
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         when (keyCode) {
-            KeyEvent.KEYCODE_HELP -> {
-                Log.d(TAG, "Help key intercepted in onKeyDown")
-                handleHelpKey()
-                return true
-            }
             KeyEvent.KEYCODE_LAST_CHANNEL -> {
                 Log.d(TAG, "Last Channel key intercepted in onKeyDown")
                 handleLastChannelKey()
@@ -285,19 +272,6 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Processing Guide key")
         // 直接模拟GUIDE按键传递给UI层
         simulateKeyPress(KeyEvent.KEYCODE_GUIDE)
-    }
-    
-    /**
-     * 处理帮助按键
-     */
-    private fun handleHelpKey() {
-        Log.d(TAG, "Processing Help key")
-        // 发送广播通知应用跳转到主页
-        sendBroadcast(Intent("top.yogiczy.mytv.tv.SHOW_DASHBOARD"))
-        
-        // 也可以通过其他方式触发跳转，比如模拟按键
-        // 这里模拟发送MENU按键，让现有的按键处理逻辑来处理
-        simulateKeyPress(KeyEvent.KEYCODE_MENU)
     }
     
     /**
