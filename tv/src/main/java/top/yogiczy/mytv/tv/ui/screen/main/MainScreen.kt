@@ -91,6 +91,10 @@ fun MainScreen(
                             navController.navigateSingleTop(Screens.EpgGuide())
                         }
                     }
+                    "top.yogiczy.mytv.tv.SHOW_DASHBOARD" -> {
+                        // 跳转到主页
+                        navController.navigateSingleTop(Screens.Dashboard())
+                    }
                     "top.yogiczy.mytv.tv.SHOW_EPG_GUIDE_CHANNEL_LIST" -> {
                         // 跳转到全局节目单页面
                         navController.navigateSingleTop(Screens.EpgGuide())
@@ -117,6 +121,7 @@ fun MainScreen(
         
         val filter = IntentFilter().apply {
             addAction("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE")
+            addAction("top.yogiczy.mytv.tv.SHOW_DASHBOARD")
             addAction("top.yogiczy.mytv.tv.SHOW_EPG_GUIDE_CHANNEL_LIST")
             addAction("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE_PAGE")
             addAction("top.yogiczy.mytv.tv.TOGGLE_AUDIO_TRACKS")

@@ -209,6 +209,14 @@ class MainActivity : ComponentActivity() {
                 }
                 return true // 拦截事件，不传递给系统
             }
+            // F2键 - Dashboard主页
+            KeyEvent.KEYCODE_F2 -> {
+                if (event.action == KeyEvent.ACTION_DOWN) {
+                    Log.d(TAG, "F2 key intercepted")
+                    handleF2Key()
+                }
+                return true // 拦截事件，不传递给系统
+            }
             // 调试模式：记录所有未处理的按键，帮助识别USB遥控器的keycode
             else -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
@@ -234,6 +242,11 @@ class MainActivity : ComponentActivity() {
             KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK -> {
                 Log.d(TAG, "Media Audio Track key intercepted in onKeyDown")
                 handleAudioTrackKey()
+                return true
+            }
+            KeyEvent.KEYCODE_F2 -> {
+                Log.d(TAG, "F2 key intercepted in onKeyDown")
+                handleF2Key()
                 return true
             }
         }
@@ -290,6 +303,15 @@ class MainActivity : ComponentActivity() {
         Log.d(TAG, "Processing Audio Track key")
         // 发送广播通知应用切换音轨页面
         sendBroadcast(Intent("top.yogiczy.mytv.tv.TOGGLE_AUDIO_TRACKS"))
+    }
+    
+    /**
+     * 处理F2按键 - 跳转到Dashboard主页
+     */
+    private fun handleF2Key() {
+        Log.d(TAG, "Processing F2 key")
+        // 发送广播通知应用跳转到主页
+        sendBroadcast(Intent("top.yogiczy.mytv.tv.SHOW_DASHBOARD"))
     }
     
     /**
