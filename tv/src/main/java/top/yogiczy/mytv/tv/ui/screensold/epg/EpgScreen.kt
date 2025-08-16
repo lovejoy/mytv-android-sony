@@ -28,6 +28,7 @@ import top.yogiczy.mytv.tv.ui.tooling.PreviewWithLayoutGrids
 import top.yogiczy.mytv.tv.ui.utils.backHandler
 import top.yogiczy.mytv.tv.ui.utils.focusOnLaunched
 import top.yogiczy.mytv.tv.ui.utils.gridColumns
+import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -52,6 +53,9 @@ fun EpgScreen(
     Drawer(
         modifier = modifier
             .backHandler { onClose() }
+            .handleKeyEvents(
+                onGuide = { onClose() }
+            )
             .focusOnLaunched(),
         onDismissRequest = onClose,
         position = DrawerPosition.Start,
