@@ -82,9 +82,9 @@ class M3uIptvParser : IptvParser {
                 } else if (line.startsWith("#EXTINF")) {
                     val name = line.split(",").last().trim()
                     val epgName =
-                        Regex("tvg-id=\"(.*?)\"").find(line)?.groupValues?.get(1)?.trim()
+                        Regex("tvg-name=\"(.*?)\"").find(line)?.groupValues?.get(1)?.trim()
                             ?.ifBlank { name } ?:
-                            Regex("tvg-name=\"(.*?)\"").find(line)?.groupValues?.get(1)?.trim()
+                            Regex("tvg-id=\"(.*?)\"").find(line)?.groupValues?.get(1)?.trim()
                             ?.ifBlank { name } ?: name
                     val groupNames =
                         Regex("group-title=\"(.+?)\"").find(line)?.groupValues?.get(1)?.split(";")
