@@ -18,9 +18,7 @@ object Constants {
      * 应用 代码仓库
      */
     const val ORIGIN_APP_REPO = "https://github.com/yaoxieyoulei/mytv-android"
-    const val MYTV_REPO = "https://github.com/mytv-android/mytv-android"
-
-    const val APP_REPO = "https://github.com/lovejoy/mytv-android-sony"
+    const val APP_REPO = "https://github.com/mytv-android/mytv-android"
 
     /**
      * 交流群 telegram
@@ -61,8 +59,8 @@ object Constants {
             ),
             EpgSource(
                 name = "默认节目单 综合",
-                url = "https://gitee.com/mytv-android/myepg/raw/master/output/epg.gz"
-            )
+                url = "https://gitee.com/mytv-android/myepg/raw/master/output/epg.gz",
+            ),
         )
     )
 

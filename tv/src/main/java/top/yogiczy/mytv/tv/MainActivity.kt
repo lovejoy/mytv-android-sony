@@ -202,7 +202,7 @@ class MainActivity : ComponentActivity() {
                 return true // 拦截事件，不传递给系统
             }
             // F2键 - Dashboard主页
-            KeyEvent.KEYCODE_F2 -> {
+            KeyEvent.KEYCODE_PROG_BLUE,KeyEvent.KEYCODE_F2 -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     Log.d(TAG, "F2 key intercepted")
                     handleF2Key()

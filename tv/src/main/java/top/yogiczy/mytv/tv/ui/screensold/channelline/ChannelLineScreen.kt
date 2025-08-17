@@ -15,6 +15,7 @@ import top.yogiczy.mytv.tv.ui.screensold.components.rememberScreenAutoCloseState
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.tooling.PreviewWithLayoutGrids
 import top.yogiczy.mytv.tv.ui.utils.backHandler
+import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 import top.yogiczy.mytv.tv.R
 import androidx.compose.ui.res.stringResource
 
@@ -29,7 +30,9 @@ fun ChannelLineScreen(
     val screenAutoCloseState = rememberScreenAutoCloseState(onTimeout = onClose)
 
     Drawer(
-        modifier = modifier.backHandler { onClose() },
+        modifier = modifier
+            .backHandler { onClose() }
+            .handleKeyEvents(onChannelLineSelection = { onClose() }),
         onDismissRequest = onClose,
         position = DrawerPosition.End,
         header = { Text(stringResource(R.string.ui_channel_view_route)) },

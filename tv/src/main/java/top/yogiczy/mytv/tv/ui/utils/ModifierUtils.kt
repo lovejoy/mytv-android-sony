@@ -191,6 +191,7 @@ fun Modifier.handleKeyEvents(
     onGuide: (() -> Unit)? = null,
     onAudioTrack: (() -> Unit)? = null,
     onSubtitle: (() -> Unit)? = null,
+    onChannelLineSelection: (() -> Unit)? = null,
 ) = handleKeyEvents(
     onKeyTap = mapOf(
         KeyEvent.KEYCODE_DPAD_LEFT to onLeft,
@@ -218,7 +219,10 @@ fun Modifier.handleKeyEvents(
         KeyEvent.KEYCODE_INFO to onInfo,
         KeyEvent.KEYCODE_GUIDE to onGuide,
         KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK to onAudioTrack,
+        KeyEvent.KEYCODE_PROG_GREEN to onAudioTrack,
         KeyEvent.KEYCODE_CAPTIONS to onSubtitle,
+        KeyEvent.KEYCODE_PROG_YELLOW to onSubtitle,
+        KeyEvent.KEYCODE_PROG_RED to onChannelLineSelection,
 
         KeyEvent.KEYCODE_0 to onNumber?.let<(Int) -> Unit, () -> Unit> { { it(0) } },
         KeyEvent.KEYCODE_1 to onNumber?.let<(Int) -> Unit, () -> Unit> { { it(1) } },
@@ -276,6 +280,7 @@ fun Modifier.handleKeyEvents(
     onGuide: (() -> Unit)? = null,
     onAudioTrack: (() -> Unit)? = null,
     onSubtitle: (() -> Unit)? = null,
+    onChannelLineSelection: (() -> Unit)? = null,
 ) = handleKeyEvents(
     onLeft = onLeft?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
     onLongLeft = onLongLeft?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
@@ -293,6 +298,7 @@ fun Modifier.handleKeyEvents(
     onGuide = onGuide?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
     onAudioTrack = onAudioTrack?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
     onSubtitle = onSubtitle?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
+    onChannelLineSelection = onChannelLineSelection?.let { { if (isFocused()) it() else focusRequester.saveRequestFocus() } },
 )
 
 fun Modifier.backHandler(onBackPressed: () -> Unit) = this.onPreviewKeyEvent {

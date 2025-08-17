@@ -175,6 +175,9 @@ fun MainContent(
                 onSubtitle = {
                     mainContentState.isSubtitleTracksScreenVisible = !mainContentState.isSubtitleTracksScreenVisible
                 },
+                onChannelLineSelection = {
+                    mainContentState.isChannelLineScreenVisible = !mainContentState.isChannelLineScreenVisible
+                },
             )
             .handleDragGestures(
                 onSwipeDown = {
