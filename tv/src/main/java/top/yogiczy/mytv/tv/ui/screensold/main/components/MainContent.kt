@@ -154,7 +154,7 @@ fun MainContent(
                 onLongUp = { mainContentState.isIptvSourceScreenVisible = true },
                 onSelect = { mainContentState.isChannelScreenVisible = true },
                 onLongSelect = { mainContentState.isQuickOpScreenVisible = true },
-                onSettings = { mainContentState.isQuickOpScreenVisible = true },
+                onSettings = { mainContentState.isQuickOpScreenVisible = !mainContentState.isQuickOpScreenVisible },
                 onLongLeft = { mainContentState.isEpgScreenVisible = true },
                 onLongRight = { mainContentState.isChannelLineScreenVisible = true },
                 onLongDown = { mainContentState.isVideoPlayerControllerScreenVisible = true },

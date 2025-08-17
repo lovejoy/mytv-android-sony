@@ -42,6 +42,7 @@ import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.tooling.PreviewWithLayoutGrids
 import top.yogiczy.mytv.tv.ui.utils.backHandler
+import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 
 @Composable
 fun QuickOpScreen(
@@ -73,6 +74,7 @@ fun QuickOpScreen(
     Box(
         modifier = modifier
             .backHandler { onClose() }
+            .handleKeyEvents(onSettings = { onClose() })
             .pointerInput(Unit) { detectTapGestures { onClose() } }
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background.copy(alpha = 0.5f)),
