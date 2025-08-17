@@ -10,8 +10,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Alignment
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -28,7 +35,9 @@ import top.yogiczy.mytv.core.data.entities.channel.ChannelList
 import top.yogiczy.mytv.core.data.entities.epg.EpgList
 import top.yogiczy.mytv.tv.BuildConfig
 import top.yogiczy.mytv.tv.ui.material.Snackbar
+import top.yogiczy.mytv.tv.ui.material.PopupContent
 import top.yogiczy.mytv.tv.ui.rememberDoubleBackPressedExitState
+import top.yogiczy.mytv.tv.ui.material.Visibility
 import top.yogiczy.mytv.tv.ui.screen.Screens
 import top.yogiczy.mytv.tv.ui.screen.about.AboutScreen
 import top.yogiczy.mytv.tv.ui.screen.agreement.AgreementScreen
@@ -36,6 +45,7 @@ import top.yogiczy.mytv.tv.ui.screen.channels.ChannelsScreen
 import top.yogiczy.mytv.tv.ui.screen.dashboard.DashboardScreen
 import top.yogiczy.mytv.tv.ui.screen.favorites.FavoritesScreen
 import top.yogiczy.mytv.tv.ui.screen.loading.LoadingScreen
+import top.yogiczy.mytv.tv.ui.screen.loading.LoadingBar
 import top.yogiczy.mytv.tv.ui.screen.multiview.MultiViewScreen
 import top.yogiczy.mytv.tv.ui.screen.push.PushScreen
 import top.yogiczy.mytv.tv.ui.screen.search.SearchScreen
@@ -47,6 +57,8 @@ import top.yogiczy.mytv.tv.ui.screen.update.UpdateScreen
 import top.yogiczy.mytv.tv.ui.screen.update.UpdateViewModel
 import top.yogiczy.mytv.tv.ui.screen.update.updateVM
 import top.yogiczy.mytv.tv.ui.utils.navigateSingleTop
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun MainScreen(
@@ -56,7 +68,6 @@ fun MainScreen(
     mainViewModel: MainViewModel = mainVM,
     onBackPressed: () -> Unit = {},
 ) {
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val uiState by mainViewModel.uiState.collectAsState()
 
@@ -72,8 +83,23 @@ fun MainScreen(
     val favoriteChannelListProvider = {
         ChannelList(settingsViewModel.iptvChannelFavoriteList.map { it.channel.copy(index = -1) })
     }
-
+    val context = LocalContext.current
     val navController = rememberNavController()
+
+    var isLoading by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState) {
+        if(!isLoading)
+            return@LaunchedEffect
+        if (uiState is MainUiState.Loading)
+            return@LaunchedEffect
+        if (uiState is MainUiState.Ready)
+            isLoading = false
+        if (uiState is MainUiState.Error) {
+            kotlinx.coroutines.delay(2000) // 延迟2秒
+            isLoading = false
+        }
+    }
 
     // 处理EPG指南按键广播
     DisposableEffect(navController) {
@@ -125,7 +151,7 @@ fun MainScreen(
                 }
             }
         }
-        
+
         val filter = IntentFilter().apply {
             addAction("top.yogiczy.mytv.tv.TOGGLE_EPG_GUIDE")
             addAction("top.yogiczy.mytv.tv.SHOW_DASHBOARD")
@@ -138,7 +164,7 @@ fun MainScreen(
         } else {
             context.registerReceiver(receiver, filter)
         }
-        
+
         onDispose {
             context.unregisterReceiver(receiver)
         }
@@ -150,16 +176,15 @@ fun MainScreen(
     }
 
     fun onChannelFavoriteToggle(channel: Channel) {
+
         if (!settingsViewModel.iptvChannelFavoriteEnable) return
-
-
         if (settingsViewModel.iptvChannelFavoriteList.any { it.channel == channel }) {
             settingsViewModel.iptvChannelFavoriteList =
                 ChannelFavoriteList(settingsViewModel.iptvChannelFavoriteList.filter {
                     it.channel != channel
                 })
 
-            Snackbar.show("取消收藏：${channel.name}")
+            Snackbar.show("${context.getString(R.string.ui_channel_info_favorite_cancel)}${channel.name}")
         } else {
             val favoriteChannel = ChannelFavorite(
                 channel = channel,
@@ -170,27 +195,26 @@ fun MainScreen(
             settingsViewModel.iptvChannelFavoriteList =
                 ChannelFavoriteList(settingsViewModel.iptvChannelFavoriteList + favoriteChannel)
 
-            Snackbar.show("已收藏：${channel.name}")
+            Snackbar.show("${context.getString(R.string.ui_channel_info_favorite_add)}${channel.name}")
         }
     }
 
     fun onChannelFavoriteClear() {
         if (!settingsViewModel.iptvChannelFavoriteEnable) return
-
         settingsViewModel.iptvChannelFavoriteList = ChannelFavoriteList()
-        Snackbar.show("已清空所有收藏")
+        Snackbar.show("${context.getString(R.string.ui_channel_info_favorite_clear)}")
     }
 
     fun checkUpdate(quiet: Boolean = true) {
         coroutineScope.launch {
-            if (!quiet) Snackbar.show("正在检查更新...", leadingLoading = true, duration = 5000)
+            if (!quiet) Snackbar.show("${context.getString(R.string.ui_channel_info_update_checking)}", leadingLoading = true, duration = 5000)
 
             delay(3000)
             updateViewModel.checkUpdate(BuildConfig.VERSION_NAME, settingsViewModel.updateChannel)
 
             if (!quiet) {
-                if (updateViewModel.isUpdateAvailable) Snackbar.show("发现新版本: v${updateViewModel.latestRelease.version}")
-                else Snackbar.show("当前已是最新版本")
+                if (updateViewModel.isUpdateAvailable) Snackbar.show("${context.getString(R.string.ui_channel_info_update_found)}v${updateViewModel.latestRelease.version}")
+                else Snackbar.show("${context.getString(R.string.ui_channel_info_update_latest)}")
             }
 
             if (!updateViewModel.isUpdateAvailable) return@launch
@@ -200,7 +224,7 @@ fun MainScreen(
             if (settingsViewModel.updateForceRemind) {
                 navController.navigateSingleTop(Screens.Update())
             } else {
-                if (quiet) Snackbar.show("发现新版本: v${updateViewModel.latestRelease.version}")
+                if (quiet) Snackbar.show("${context.getString(R.string.ui_channel_info_update_found)}v${updateViewModel.latestRelease.version}")
             }
         }
     }
@@ -211,9 +235,8 @@ fun MainScreen(
         navController.navigateUp()
         navController.navigateSingleTop(Screens.Loading())
     }
-
     NavHost(
-        modifier = modifier,
+        modifier = Modifier.fillMaxSize(),
         navController = navController,
         startDestination = if (settingsViewModel.appAgreementAgreed) Screens.Loading() else Screens.Agreement(),
         builder = {
@@ -230,7 +253,10 @@ fun MainScreen(
 
             composable(Screens.Loading()) {
                 LoadingScreen(
-                    mainUiState = uiState,
+                    onShowDialog = {
+                        if (uiState is MainUiState.Loading)
+                            isLoading = true
+                    },
                     toDashboardScreen = {
                         navController.navigateUp()
                         navController.navigateSingleTop(settingsViewModel.appStartupScreen)
@@ -247,6 +273,7 @@ fun MainScreen(
                 DashboardScreen(
                     currentIptvSourceProvider = { settingsViewModel.iptvSourceCurrent },
                     channelFavoriteListProvider = { settingsViewModel.iptvChannelFavoriteList },
+                    channelHistoryListProvider = { settingsViewModel.iptvChannelHistoryList },
                     onChannelSelected = { onChannelSelected(it) },
                     epgListProvider = epgListProvider,
                     toLiveScreen = { navController.navigateSingleTop(Screens.Live()) },
@@ -273,6 +300,7 @@ fun MainScreen(
 
                 key(settingsViewModel.videoPlayerCore, settingsViewModel.videoPlayerForceSoftDecode) {
                     top.yogiczy.mytv.tv.ui.screensold.main.components.MainContent(
+                        isLoadingProvider = { isLoading },
                         filteredChannelGroupListProvider = filteredChannelGroupListProvider,
                         favoriteChannelListProvider = favoriteChannelListProvider,
                         epgListProvider = epgListProvider,
@@ -296,7 +324,7 @@ fun MainScreen(
                                     navController.navigateUp()
                                 } else {
                                     doubleBackPressedExitState.backPress()
-                                    Snackbar.show("再按一次退出直播")
+                                    Snackbar.show("${context.getString(R.string.ui_channel_info_exit_live)}")
                                 }
                             }
                         },
@@ -394,4 +422,13 @@ fun MainScreen(
             }
         },
     )
+    PopupContent(
+        visibleProvider = { isLoading },
+        onDismissRequest = {},
+    ) {
+        LoadingBar(
+            mainUiState = uiState,
+            visibleProvider = { isLoading },
+        )
+    }
 }

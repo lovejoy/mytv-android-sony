@@ -9,11 +9,15 @@ import kotlin.math.max
 
 fun Long.humanizeMs(): String {
     return when (this) {
-        in 0..<60_000 -> "${this / 1000}秒"
-        in 60_000..<3_600_000 -> "${this / 60_000}分钟"
-        in 3_600_000..<86_400_000 -> "${this / 3_600_000}小时"
-        else -> "${this / 86_400_000}天"
+        in 0..<60_000 -> "${this / 1000} s"
+        in 60_000..<3_600_000 -> "${this / 60_000} min"
+        in 3_600_000..<86_400_000 -> "${this / 3_600_000} h"
+        else -> "${this / 86_400_000} d"
     }
+}
+
+fun Long.humanizeBufferNum(): String {
+    return "${this.humanizeMs()} | ${(this * 0.03).toLong()}f"
 }
 
 fun Long.humanizeBytes(): String {

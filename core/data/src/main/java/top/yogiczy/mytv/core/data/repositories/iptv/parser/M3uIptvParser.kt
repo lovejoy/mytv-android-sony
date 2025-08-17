@@ -5,14 +5,14 @@ import kotlinx.coroutines.withContext
 import top.yogiczy.mytv.core.data.utils.Logger
 
 /**
- * m3u直播源解析
+ * m3u订阅源解析
  */
 class M3uIptvParser : IptvParser {
 
     private val logger = Logger.create("M3uIptvParser")
 
     override fun isSupport(url: String, data: String): Boolean {
-        return data.startsWith("#EXTM3U")
+        return data.contains("#EXTM3U")
     }
 
     override suspend fun parse(data: String) =
@@ -21,9 +21,43 @@ class M3uIptvParser : IptvParser {
             val channelList = mutableListOf<IptvParser.ChannelItem>()
             var globalPlaybackType: Int? = null
             var globalPlaybackFormat: String? = null
-            var addedChannels: List<IptvParser.ChannelItem> = listOf()
+            var groupNameList = listOf<String>()
+            var addedChannel = IptvParser.ChannelItem(
+                name = "",
+                epgName = "",
+                groupName = "",
+                url = "",
+                logo = null,
+                httpUserAgent = null,
+                httpReferrer = null,
+                httpOrigin = null,
+                httpCookie = null,
+                playbackType = null,
+                playbackFormat = null,
+            )
+            var acceptNewConfig = true
             lines.forEach { line ->
                 if (line.isBlank()) return@forEach
+                if(!acceptNewConfig && (
+                    line.startsWith("#EXTINF") 
+                    || line.startsWith("#EXTM3U") 
+                    || line.startsWith("#EXTVLCOPT") 
+                    || line.startsWith("#KODIPROP"))){
+                    addedChannel = IptvParser.ChannelItem(
+                        name = "",
+                        epgName = "",
+                        groupName = "",
+                        url = "",
+                        logo = null,
+                        httpUserAgent = null,
+                        httpReferrer = null,
+                        httpOrigin = null,
+                        httpCookie = null,
+                        playbackType = null,
+                        playbackFormat = null,
+                    )
+                    acceptNewConfig = true
+                }
                 if (line.startsWith("#EXTM3U")) {
                     // 解析扩展信息
                     val playbackTypeString =
@@ -48,7 +82,9 @@ class M3uIptvParser : IptvParser {
                 } else if (line.startsWith("#EXTINF")) {
                     val name = line.split(",").last().trim()
                     val epgName =
-                        Regex("tvg-name=\"(.*?)\"").find(line)?.groupValues?.get(1)?.trim()
+                        Regex("tvg-id=\"(.*?)\"").find(line)?.groupValues?.get(1)?.trim()
+                            ?.ifBlank { name } ?:
+                            Regex("tvg-name=\"(.*?)\"").find(line)?.groupValues?.get(1)?.trim()
                             ?.ifBlank { name } ?: name
                     val groupNames =
                         Regex("group-title=\"(.+?)\"").find(line)?.groupValues?.get(1)?.split(";")
@@ -61,6 +97,8 @@ class M3uIptvParser : IptvParser {
                         Regex("http-referrer=\"(.+?)\"").find(line)?.groupValues?.get(1)?.trim()
                     val httpOrigin =
                         Regex("http-origin=\"(.+?)\"").find(line)?.groupValues?.get(1)?.trim()
+                    val httpCookie =
+                        Regex("http-cookie=\"(.+?)\"").find(line)?.groupValues?.get(1)?.trim()
                     var playbackType: Int? = null
                     var playbackFormat: String? = null
                     if(globalPlaybackType != null){
@@ -88,41 +126,54 @@ class M3uIptvParser : IptvParser {
                         } 
                     }
                     // 记录解析结果
-                    logger.i("解析结果: name=$name, epgName=$epgName, groupNames=$groupNames, logo=$logo, httpUserAgent=$httpUserAgent, httpReferrer=$httpReferrer, httpOrigin=$httpOrigin, playbackType=$playbackType, playbackFormat=$playbackFormat")
+                    logger.i("解析结果: name=$name, epgName=$epgName, groupNames=$groupNames, logo=$logo, httpUserAgent=$httpUserAgent, httpReferrer=$httpReferrer, httpOrigin=$httpOrigin, httpCookie=$httpCookie, playbackType=$playbackType, playbackFormat=$playbackFormat")
 
-                    addedChannels = groupNames.map { groupName ->
-                        IptvParser.ChannelItem(
-                            name = name,
-                            epgName = epgName,
-                            groupName = groupName,
-                            url = "",
-                            logo = logo,
-                            httpUserAgent = httpUserAgent,
-                            httpReferrer = httpReferrer,
-                            httpOrigin = httpOrigin,
-                            playbackType = playbackType,
-                            playbackFormat = playbackFormat,
-                        )
-                    }
+                    groupNameList = groupNames
+                    addedChannel = addedChannel.copy(
+                        name = name,
+                        epgName = epgName,
+                        groupName = "其他",
+                        logo = logo,
+                        httpUserAgent = httpUserAgent ?: addedChannel.httpUserAgent,
+                        httpReferrer = httpReferrer ?: addedChannel.httpReferrer,
+                        httpOrigin = httpOrigin ?: addedChannel.httpOrigin,
+                        httpCookie = httpCookie ?: addedChannel.httpCookie,
+                        playbackType = playbackType,
+                        playbackFormat = playbackFormat
+                    )
                 } else {
                     if (line.startsWith("#KODIPROP:inputstream.adaptive.manifest_type")) {
-                        addedChannels =
-                            addedChannels.map { it.copy(manifestType = line.split("=").last()) }
+                        addedChannel = addedChannel.copy( manifestType = line.split("=").last())
                     } else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_type")) {
-                        addedChannels =
-                            addedChannels.map { it.copy(licenseType = line.split("=").last()) }
+                        addedChannel =
+                            addedChannel.copy(licenseType = line.split("=").last())
                     } else if (line.startsWith("#KODIPROP:inputstream.adaptive.license_key")) {
-                        addedChannels =
-                            addedChannels.map { it.copy(licenseKey = line.split("=").last()) }
-                    } else if (line.startsWith("#EXTVLCOPT:http-origin")) {
-                        addedChannels =
-                            addedChannels.map { it.copy(httpOrigin = line.split("=").last()) }
+                        addedChannel =
+                            addedChannel.copy(licenseKey = line.split("=").last())
+                    } else if(line.startsWith("#KODIPROP:inputstream.adaptive.stream_headers=Cookie=")){
+                        addedChannel =
+                            addedChannel.copy(httpCookie = line.split("=").last())
+                    }else if(line.startsWith("#KODIPROP:inputstream.adaptive.stream_headers=Cookie%3d")){
+                        addedChannel =
+                            addedChannel.copy(httpCookie = line.split(".stream_headers=Cookie%3d").last())
+                    }else if(line.startsWith("#KODIPROP:inputstream.adaptive.stream_headers=User-Agent=")){
+                        addedChannel =
+                            addedChannel.copy(httpUserAgent = line.split("=").last())
+                    }else if(line.startsWith("#KODIPROP:inputstream.adaptive.stream_headers=Referer=")){
+                        addedChannel =
+                            addedChannel.copy(httpReferrer = line.split("=").last())
+                    }else if (line.startsWith("#EXTVLCOPT:http-origin")) {
+                        addedChannel =
+                            addedChannel.copy(httpOrigin = line.split("=").last())
                     } else if (line.startsWith("#EXTVLCOPT:http-referrer")) {
-                        addedChannels =
-                            addedChannels.map { it.copy(httpReferrer = line.split("=").last()) }
+                        addedChannel =
+                            addedChannel.copy(httpReferrer = line.split("=").last())
                     } else if (line.startsWith("#EXTVLCOPT:http-user-agent")) {
-                        addedChannels =
-                            addedChannels.map { it.copy(httpUserAgent = line.split("=").last()) }                      
+                        addedChannel =
+                            addedChannel.copy(httpUserAgent = line.split("=").last())
+                    } else if (line.startsWith("#EXTVLCOPT:http-cookie")) {
+                        addedChannel =
+                            addedChannel.copy(httpCookie = line.split("=").last())
                     } else if (line.startsWith("#") || line.startsWith("//")) {
                         return@forEach
                     } else{
@@ -134,16 +185,24 @@ class M3uIptvParser : IptvParser {
                         if (trimmedUrl.startsWith("webview://")) {
                             logger.i("检测到WebView链接: $trimmedUrl")
                             logger.i("将URL的hybridType设置为WebView")
-                            channelList.addAll(addedChannels.map { 
-                                it.copy(
-                                    url = trimmedUrl, 
+                            channelList.addAll(groupNameList.map { groupName ->
+                                addedChannel.copy(
+                                    groupName = groupName,
+                                    url = trimmedUrl.removePrefix("webview://"),
                                     hybridType = IptvParser.ChannelItem.HybridType.WebView
-                                ) 
+                                )
                             })
                         } else {
                             logger.i("普通URL: $trimmedUrl, hybridType=None")
-                            channelList.addAll(addedChannels.map { it.copy(url = trimmedUrl) })
+                            channelList.addAll(groupNameList.map { groupName ->
+                                addedChannel.copy(
+                                    groupName = groupName,
+                                    url = trimmedUrl,
+                                    hybridType = IptvParser.ChannelItem.HybridType.None
+                                )
+                            })
                         }
+                        acceptNewConfig = false
                     }
                 }
             }

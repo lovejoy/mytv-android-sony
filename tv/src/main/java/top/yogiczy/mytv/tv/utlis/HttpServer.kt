@@ -75,7 +75,25 @@ object HttpServer : Loggable("HttpServer") {
                     handleAssets(response, context, "text/html", "remote-configs/index.html")
                 }
 
+                server.get("/advance_en") { _, response ->
+                    handleAssets(response, context, "text/html", "remote-configs-en/index.html")
+                }
+
                 server.get("/remote-configs/(.*)") { request, response ->
+                    val contentType = when (request.path.split(".").last()) {
+                        "css" -> "text/css"
+                        "js" -> "text/javascript"
+                        "html" -> "text/html"
+                        "json" -> "application/json"
+                        "svg" -> "image/svg+xml"
+                        "png" -> "image/png"
+                        else -> "text/plain"
+                    }
+
+                    handleAssets(response, context, contentType, request.path.removePrefix("/"))
+                }
+
+                server.get("/remote-configs-en/(.*)") { request, response ->
                     val contentType = when (request.path.split(".").last()) {
                         "css" -> "text/css"
                         "js" -> "text/javascript"
@@ -225,23 +243,43 @@ object HttpServer : Loggable("HttpServer") {
         val url = body.get("url").toString()
         val filePath = body.get("filePath").toString()
         val content = body.get("content").toString()
+        val httpUserAgent = body.opt("httpUserAgent")?.toString()
 
         var newIptvSource: IptvSource? = null
 
         when (type) {
             "url" -> {
-                newIptvSource = IptvSource(name, url)
+                newIptvSource = IptvSource(name = name, url = url, sourceType = 0, httpUserAgent = httpUserAgent)
             }
 
             "file" -> {
-                newIptvSource = IptvSource(name, filePath, true)
+                newIptvSource = IptvSource(name = name, url = filePath, sourceType = 1, httpUserAgent = httpUserAgent)
             }
 
             "content" -> {
                 val file =
                     File(Globals.fileDir, "iptv_source_local_${System.currentTimeMillis()}.txt")
                 file.writeText(content)
-                newIptvSource = IptvSource(name, file.path, true)
+                newIptvSource = IptvSource(name = name, url = file.path, sourceType = 1, httpUserAgent = httpUserAgent)
+            }
+
+            "xtream" -> {
+                val userName = body.get("userName").toString()
+                val password = body.get("password").toString()
+                val format = body.get("format").toString()
+                newIptvSource = IptvSource(
+                    name = name,
+                    url = url,
+                    sourceType = 2,
+                    userName = userName,
+                    password = password,
+                    format = format,
+                    httpUserAgent = httpUserAgent
+                )
+            }
+
+            else -> {
+                return response.code(400).send("Invalid type")
             }
         }
 

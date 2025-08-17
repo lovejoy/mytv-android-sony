@@ -37,6 +37,7 @@ import top.yogiczy.mytv.core.data.repositories.iptv.IptvRepository
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.screen.components.AppScreen
 import top.yogiczy.mytv.tv.ui.screen.dashboard.components.DashboardFavoriteList
+import top.yogiczy.mytv.tv.ui.screen.dashboard.components.DashboardHistoryList
 import top.yogiczy.mytv.tv.ui.screen.dashboard.components.DashboardModuleList
 import top.yogiczy.mytv.tv.ui.screen.dashboard.components.DashboardTime
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
@@ -49,6 +50,7 @@ fun DashboardScreen(
     modifier: Modifier = Modifier,
     currentIptvSourceProvider: () -> IptvSource = { IptvSource() },
     channelFavoriteListProvider: () -> ChannelFavoriteList = { ChannelFavoriteList() },
+    channelHistoryListProvider: () -> ChannelList = { ChannelList() },
     onChannelSelected: (Channel) -> Unit = {},
     onChannelFavoriteToggle: (Channel) -> Unit = {},
     epgListProvider: () -> EpgList = { EpgList() },
@@ -112,6 +114,14 @@ fun DashboardScreen(
                     epgListProvider = epgListProvider,
                 )
             }
+
+            item{
+                DashboardHistoryList(
+                    channelHistoryListProvider = channelHistoryListProvider,
+                    onChannelSelected = onChannelSelected,
+                    epgListProvider = epgListProvider,
+                )
+            }
         }
     }
 }
@@ -170,7 +180,7 @@ fun DashboardScreeIptvSource(
 private fun DashboardScreenScreen() {
     MyTvTheme {
         DashboardScreen(
-            currentIptvSourceProvider = { IptvSource(name = "默认播放源1") },
+            currentIptvSourceProvider = { IptvSource(name = "默认订阅源1") },
             channelFavoriteListProvider = { ChannelFavoriteList.EXAMPLE },
             epgListProvider = { EpgList.example(ChannelList.EXAMPLE) },
         )

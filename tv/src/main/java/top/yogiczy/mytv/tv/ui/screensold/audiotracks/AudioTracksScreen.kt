@@ -14,6 +14,8 @@ import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.tooling.PreviewWithLayoutGrids
 import top.yogiczy.mytv.tv.ui.utils.backHandler
 import top.yogiczy.mytv.tv.ui.utils.gridColumns
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 
 @Composable
@@ -31,7 +33,7 @@ fun AudioTracksScreen(
             .handleKeyEvents(onAudioTrack = { onClose() }),
         onDismissRequest = onClose,
         position = DrawerPosition.End,
-        header = { Text("音轨") },
+        header = { Text(stringResource(R.string.ui_channel_view_audio_track)) },
     ) {
         AudioTrackItemList(
             modifier = Modifier.width(4.5f.gridColumns()),

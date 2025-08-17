@@ -38,9 +38,11 @@ import top.yogiczy.mytv.tv.ui.screen.settings.categories.SettingsUpdateScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.categories.SettingsVideoPlayerScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsChannelGroupVisibilityScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsCloudSyncProviderScreen
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsDecoderInfoScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsEpgRefreshTimeThresholdScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsEpgSourceScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvHybridModeScreen
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiControlSettingScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvSourceCacheTimeScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvSourceScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsNetworkRetryCountScreen
@@ -57,6 +59,8 @@ import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerL
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerBufferTimeScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsVideoPlayerRenderModeScreen
 import top.yogiczy.mytv.tv.ui.utils.navigateSingleTop
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.platform.LocalContext
 
 object SettingsScreen {
     const val START_DESTINATION = "startDestination"
@@ -80,7 +84,7 @@ fun SettingsScreen(
             delay(1000)
         }
     }
-
+    val context = LocalContext.current
     val navController = rememberNavController()
 
     AppScreen(modifier = modifier, onBackPressed = onBackPressed) {
@@ -165,6 +169,10 @@ fun SettingsScreen(
 
                 composable(SettingsCategories.CONTROL.name) {
                     SettingsControlScreen(
+                        settingsViewModel = settingsViewModel,
+                        toUiControlActionSettingsScreen = {
+                            navController.navigateSingleTop(SettingsSubCategories.UI_CONTROL_ACTION.name)
+                        },
                         onBackPressed = { navController.navigateUp() },
                     )
                 }
@@ -220,6 +228,9 @@ fun SettingsScreen(
 
                 composable(SettingsCategories.DEBUG.name) {
                     SettingsDebugScreen(
+                        toUiSettingsDecoderInfoScreen = {
+                            navController.navigateSingleTop(SettingsSubCategories.UI_SETTINGS_DECODER_INFO.name)
+                        },
                         onBackPressed = { navController.navigateUp() },
                     )
                 }
@@ -239,7 +250,7 @@ fun SettingsScreen(
                 composable(SettingsSubCategories.IPTV_SOURCE.name) {
                     SettingsIptvSourceScreen(
                         currentIptvSourceProvider = { settingsViewModel.iptvSourceCurrent },
-                        iptvSourceListProvider = { IptvSourceList(Constants.IPTV_SOURCE_LIST + settingsViewModel.iptvSourceList) },
+                        iptvSourceListProvider = { settingsViewModel.iptvSourceList },
                         onSetCurrent = {
                             settingsViewModel.iptvSourceCurrent = it
                             settingsViewModel.iptvChannelGroupHiddenList = emptySet()
@@ -253,7 +264,7 @@ fun SettingsScreen(
                         onClearCache = {
                             coroutineScope.launch {
                                 IptvRepository(it).clearCache()
-                                Snackbar.show("缓存已清除")
+                                Snackbar.show("${context.getString(R.string.ui_cache_cleared)}")
                             }
                         },
                         onBackPressed = {
@@ -268,6 +279,52 @@ fun SettingsScreen(
                         onCacheTimeChanged = {
                             settingsViewModel.iptvSourceCacheTime = it
                             navController.navigateUp()
+                        },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
+                composable(SettingsSubCategories.UI_CONTROL_ACTION.name) {
+                    SettingsUiControlSettingScreen(
+                        keyDownEventUpProvider = { settingsViewModel.keyDownEventUp },
+                        onkeyDownEventUpChanged = {
+                            settingsViewModel.keyDownEventUp = it
+                        },
+                        keyDownEventDownProvider = { settingsViewModel.keyDownEventDown },
+                        onkeyDownEventDownChanged = {
+                            settingsViewModel.keyDownEventDown = it
+                        },
+                        keyDownEventLeftProvider = { settingsViewModel.keyDownEventLeft },
+                        onkeyDownEventLeftChanged = {
+                            settingsViewModel.keyDownEventLeft = it
+                        },
+                        keyDownEventRightProvider = { settingsViewModel.keyDownEventRight },
+                        onkeyDownEventRightChanged = {
+                            settingsViewModel.keyDownEventRight = it
+                        },
+                        keyDownEventSelectProvider = { settingsViewModel.keyDownEventSelect },
+                        onkeyDownEventSelectChanged = {
+                            settingsViewModel.keyDownEventSelect = it
+                        },
+                        keyDownEventLongSelectProvider = { settingsViewModel.keyDownEventLongSelect },
+                        onkeyDownEventLongSelectChanged = {
+                            settingsViewModel.keyDownEventLongSelect = it
+                        },
+                        keyDownEventLongUpProvider = { settingsViewModel.keyDownEventLongUp },
+                        onkeyDownEventLongUpChanged = {
+                            settingsViewModel.keyDownEventLongUp = it
+                        },
+                        keyDownEventLongDownProvider = { settingsViewModel.keyDownEventLongDown },
+                        onkeyDownEventLongDownChanged = {
+                            settingsViewModel.keyDownEventLongDown = it
+                        },
+                        keyDownEventLongLeftProvider = { settingsViewModel.keyDownEventLongLeft },
+                        onkeyDownEventLongLeftChanged = {
+                            settingsViewModel.keyDownEventLongLeft = it
+                        },
+                        keyDownEventLongRightProvider = { settingsViewModel.keyDownEventLongRight },
+                        onkeyDownEventLongRightChanged = {
+                            settingsViewModel.keyDownEventLongRight = it
                         },
                         onBackPressed = { navController.navigateUp() },
                     )
@@ -315,7 +372,7 @@ fun SettingsScreen(
                         onClearCache = {
                             coroutineScope.launch {
                                 EpgRepository(it).clearCache()
-                                Snackbar.show("缓存已清除")
+                                Snackbar.show("${context.getString(R.string.ui_cache_cleared)}")
                             }
                         },
                         onBackPressed = { navController.navigateUp() },
@@ -486,6 +543,12 @@ fun SettingsScreen(
                             settingsViewModel.cloudSyncProvider = it
                             navController.navigateUp()
                         },
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
+                composable(SettingsSubCategories.UI_SETTINGS_DECODER_INFO.name) {
+                    SettingsDecoderInfoScreen(
                         onBackPressed = { navController.navigateUp() },
                     )
                 }

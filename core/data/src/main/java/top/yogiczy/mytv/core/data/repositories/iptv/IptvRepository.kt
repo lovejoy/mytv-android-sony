@@ -13,8 +13,9 @@ import top.yogiczy.mytv.core.data.repositories.iptv.parser.IptvParser.ChannelIte
 import top.yogiczy.mytv.core.data.utils.Globals
 import top.yogiczy.mytv.core.data.utils.Logger
 import kotlin.time.measureTimedValue
+import com.dokar.quickjs.QuickJs
 /**
- * 播放源数据获取
+ * 订阅源数据获取
  */
 class IptvRepository(private val source: IptvSource) :
     FileCacheRepository(source.cacheFileName("json")) {
@@ -24,7 +25,7 @@ class IptvRepository(private val source: IptvSource) :
 
     private fun isExpired(lastModified: Long, cacheTime: Long): Boolean {
         val timeout =
-            System.currentTimeMillis() - lastModified >= (if (source.isLocal) Long.MAX_VALUE else cacheTime)
+            System.currentTimeMillis() - lastModified >= (if (source.sourceType == 1) Long.MAX_VALUE else cacheTime)
         val rawChanged = lastModified < rawRepository.lastModified()
 
         return timeout || rawChanged
@@ -36,16 +37,23 @@ class IptvRepository(private val source: IptvSource) :
         val raw = rawRepository.getRaw()
         val parser = IptvParser.instances.first { it.isSupport(source.url, raw) }
 
-        log.d("开始解析播放源（${source.name}）...")
+        log.d("开始解析订阅源（${source.name}）...")
         return measureTimedValue {
             val list = parser.parse(raw)
+            val processedList = list.map { item ->
+                if (item.httpUserAgent.isNullOrBlank() && !source.httpUserAgent.isNullOrBlank()) {
+                    item.copy(httpUserAgent = source.httpUserAgent)
+                } else {
+                    item
+                }
+            }
             Globals.json.encodeToString(withContext(Dispatchers.Default) {
-                runCatching { transform(list) }
-                    .getOrDefault(list)
+                runCatching { transform(processedList) }
+                    .getOrDefault(processedList)
                     .toChannelGroupList()
             })
         }.let {
-            log.i("解析播放源（${source.name}）完成", null, it.duration)
+            log.i("解析订阅源（${source.name}）完成", null, it.duration)
             it.value
         }
     }
@@ -54,8 +62,6 @@ class IptvRepository(private val source: IptvSource) :
         withContext(Dispatchers.IO) {
             if (source.transformJs.isNullOrBlank()) return@withContext channelList
 
-            val context = org.mozilla.javascript.Context.enter()
-            context.optimizationLevel = -1
             val scriptString = """
                     (function() {
                         var channelList = ${Globals.json.encodeToString(channelList)};
@@ -64,15 +70,13 @@ class IptvRepository(private val source: IptvSource) :
                     })();
                     """.trimIndent()
             val result = runCatching {
-                val scope = context.initStandardObjects()
-                context.evaluateString(
-                    scope, scriptString, "JavaScript", 1, null
-                ) as String
+                QuickJs.create(Dispatchers.Default).use { quickJs ->
+                    quickJs.evaluate(scriptString) as String
+                }
             }
-            org.mozilla.javascript.Context.exit()
 
             if (result.isFailure) {
-                log.e("转换播放源（${source.name}）错误: ${result.exceptionOrNull()}")
+                log.e("转换订阅源（${source.name}）错误: ${result.exceptionOrNull()}")
                 // log.e("转换脚本: ${scriptString}")
             }
 
@@ -81,7 +85,7 @@ class IptvRepository(private val source: IptvSource) :
         }
 
     /**
-     * 获取播放源分组列表
+     * 获取订阅源分组列表
      */
     suspend fun getChannelGroupList(cacheTime: Long): ChannelGroupList {
         try {
@@ -90,10 +94,10 @@ class IptvRepository(private val source: IptvSource) :
             }
 
             return Globals.json.decodeFromString<ChannelGroupList>(json).also { groupList ->
-                log.i("加载播放源（${source.name}）：${groupList.size}个分组，${groupList.sumOf { it.channelList.size }}个频道")
+                log.i("加载订阅源（${source.name}）：${groupList.size}个分组，${groupList.sumOf { it.channelList.size }}个频道")
             }
         } catch (ex: Exception) {
-            log.e("加载播放源（${source.name}）失败", ex)
+            log.e("加载订阅源（${source.name}）失败", ex)
             throw ex
         }
     }
@@ -119,29 +123,43 @@ class IptvRepository(private val source: IptvSource) :
 }
 
 private class IptvRawRepository(private val source: IptvSource) : FileCacheRepository(
-    if (source.isLocal) source.url else source.cacheFileName("txt"),
-    source.isLocal,
+    if (source.sourceType == 1) source.url else source.cacheFileName("txt"),
+    source.sourceType == 1,
 ) {
 
     private val log = Logger.create("IptvRawRepository")
 
     suspend fun getRaw(cacheTime: Long = 0): String {
-        return getOrRefresh(if (source.isLocal) Long.MAX_VALUE else cacheTime) {
+        return getOrRefresh(if (source.sourceType == 1) Long.MAX_VALUE else cacheTime) {
 
+            val url = when (source.sourceType) {
+                0 -> source.url
+                1 -> source.url // 本地文件直接使用url
+                2 -> getXtreamUrl(source)
+                else -> throw IllegalArgumentException("不支持的订阅源类型: ${source.sourceType}")
+            }
 
-            log.d("获取播放源: $source")
+            log.d("获取订阅源: $source")
 
             try {
-                source.url.request { body -> body.string() } ?: ""
+                url.request({ builder ->
+                    source.httpUserAgent?.let { builder.addHeader("User-Agent", it) }
+                    builder
+                }) { body -> body.string() } ?: ""
             } catch (ex: Exception) {
-                log.e("获取播放源（${source.name}）失败", ex)
-                throw HttpException("获取播放源失败，请检查网络连接", ex)
+                log.e("获取订阅源（${source.name}）失败", ex)
+                throw HttpException("获取订阅源失败，请检查网络连接", ex)
             }
         }
     }
 
     override suspend fun clearCache() {
-        if (source.isLocal) return
+        if (source.sourceType == 1) return
         super.clearCache()
     }
+}
+
+private fun getXtreamUrl(source: IptvSource): String {
+    return "${source.url}/get.php?username=${source.userName}&password=${source.password}" + if (source.format.isNullOrBlank()) "" else "&type=${source.format}"
+        .also { Logger.create("IptvRepository").d("获取xtream订阅源URL: $it") }
 }

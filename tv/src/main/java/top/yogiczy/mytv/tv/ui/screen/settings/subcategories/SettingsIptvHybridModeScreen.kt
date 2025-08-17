@@ -20,6 +20,8 @@ import top.yogiczy.mytv.tv.ui.screen.components.AppScreen
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.Configs
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun SettingsIptvHybridModeScreen(
@@ -32,7 +34,7 @@ fun SettingsIptvHybridModeScreen(
 
     AppScreen(
         modifier = modifier.padding(top = 10.dp),
-        header = { Text("设置 / 播放源 / 自动追加内置网页源") },
+        header = { Text("${stringResource(R.string.ui_dashboard_module_settings)} / ${stringResource(R.string.ui_channel_view_source)} / ${stringResource(R.string.ui_auto_add_web_source)}") },
         canBack = true,
         onBackPressed = onBackPressed,
     ) {
@@ -45,13 +47,21 @@ fun SettingsIptvHybridModeScreen(
                     modifier = Modifier.handleKeyEvents(
                         onSelect = { onHybridModeChanged(mode) },
                     ),
-                    headlineContent = { Text(mode.label) },
+                    headlineContent = {
+                        Text(
+                            when (mode) {
+                                Configs.IptvHybridMode.DISABLE -> stringResource(R.string.ui_hybrid_mode_disable)
+                                Configs.IptvHybridMode.IPTV_FIRST -> stringResource(R.string.ui_hybrid_mode_to_back)
+                                Configs.IptvHybridMode.HYBRID_FIRST -> stringResource(R.string.ui_hybrid_mode_to_front)
+                            }
+                        )
+                    },
                     supportingContent = {
                         Text(
                             when (mode) {
-                                Configs.IptvHybridMode.DISABLE -> ""
-                                Configs.IptvHybridMode.IPTV_FIRST -> "优先尝试播放播放源中的直播源，若所有的直播源均不可用，则尝试网页源"
-                                Configs.IptvHybridMode.HYBRID_FIRST -> "优先尝试播放网页源，若网页源不可用，则播放直播源中的线路"
+                                Configs.IptvHybridMode.DISABLE -> stringResource(R.string.ui_hybrid_mode_disable_auto_add_web_source)
+                                Configs.IptvHybridMode.IPTV_FIRST -> stringResource(R.string.ui_hybrid_mode_auto_add_web_source_to_back)
+                                Configs.IptvHybridMode.HYBRID_FIRST -> stringResource(R.string.ui_hybrid_mode_auto_add_web_source_to_front)
                             }
                         )
                     },

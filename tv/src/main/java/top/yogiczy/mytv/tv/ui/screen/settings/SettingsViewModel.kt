@@ -9,7 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
+import top.yogiczy.mytv.core.data.entities.actions.KeyDownAction
 import top.yogiczy.mytv.core.data.entities.channel.Channel
+import top.yogiczy.mytv.core.data.entities.channel.ChannelList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelFavoriteList
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserveList
 import top.yogiczy.mytv.core.data.entities.epgsource.EpgSource
@@ -124,9 +126,13 @@ class SettingsViewModel : ViewModel() {
             afterSetWhenCloudSyncAutoPull()
         }
 
-    private var _iptvSourceList by mutableStateOf(IptvSourceList())
+    private var _iptvSourceList by mutableStateOf(Constants.IPTV_SOURCE_LIST)
     var iptvSourceList: IptvSourceList
-        get() = _iptvSourceList
+        get() = if (_iptvSourceList.isEmpty()) {
+            Constants.IPTV_SOURCE_LIST
+        } else {
+            _iptvSourceList
+        }
         set(value) {
             _iptvSourceList = value
             Configs.iptvSourceList = value
@@ -222,11 +228,29 @@ class SettingsViewModel : ViewModel() {
             afterSetWhenCloudSyncAutoPull()
         }
 
+    private var _iptvChannelHistoryList by mutableStateOf(ChannelList())
+    var iptvChannelHistoryList: ChannelList
+        get() = _iptvChannelHistoryList
+        set(value) {
+            _iptvChannelHistoryList = value
+            Configs.iptvChannelHistoryList = value
+            afterSetWhenCloudSyncAutoPull()
+        }
+
     private var _iptvChannelLastPlay by mutableStateOf(Channel.EMPTY)
     var iptvChannelLastPlay: Channel
         get() = _iptvChannelLastPlay
         set(value) {
             _iptvChannelLastPlay = value
+            if (!_iptvChannelHistoryList.contains(value)) {
+                val newList = _iptvChannelHistoryList.toMutableList().apply {
+                    if (size >= Constants.MAX_CHANNEL_HISTORY_SIZE) {
+                        removeAt(size - 1)
+                    }
+                }
+                _iptvChannelHistoryList = ChannelList(listOf(value) + newList)
+                Configs.iptvChannelHistoryList = _iptvChannelHistoryList
+            }
             Configs.iptvChannelLastPlay = value
             afterSetWhenCloudSyncAutoPull()
         }
@@ -246,15 +270,6 @@ class SettingsViewModel : ViewModel() {
         set(value) {
             _iptvChannelLinePlayableUrlList = value
             Configs.iptvChannelLinePlayableUrlList = value
-            afterSetWhenCloudSyncAutoPull()
-        }
-
-    private var _iptvChannelChangeFlip by mutableStateOf(false)
-    var iptvChannelChangeFlip: Boolean
-        get() = _iptvChannelChangeFlip
-        set(value) {
-            _iptvChannelChangeFlip = value
-            Configs.iptvChannelChangeFlip = value
             afterSetWhenCloudSyncAutoPull()
         }
 
@@ -285,14 +300,6 @@ class SettingsViewModel : ViewModel() {
             afterSetWhenCloudSyncAutoPull()
         }
 
-    private var _iptvChannelChangeLineWithLeftRight by mutableStateOf(false)
-    var iptvChannelChangeLineWithLeftRight: Boolean
-        get() = _iptvChannelChangeLineWithLeftRight
-        set(value) {
-            _iptvChannelChangeLineWithLeftRight = value
-            Configs.iptvChannelChangeLineWithLeftRight = value
-            afterSetWhenCloudSyncAutoPull()
-        }
 
     private var _epgEnable by mutableStateOf(false)
     var epgEnable: Boolean
@@ -390,6 +397,33 @@ class SettingsViewModel : ViewModel() {
         set(value) {
             _uiUseClassicPanelScreen = value
             Configs.uiUseClassicPanelScreen = value
+            afterSetWhenCloudSyncAutoPull()
+        }
+
+    private var _uiClassicShowSourceList by mutableStateOf(Configs.uiClassicShowSourceList)
+    var uiClassicShowSourceList: Boolean
+        get() = _uiClassicShowSourceList
+        set(value) {
+            _uiClassicShowSourceList = value
+            Configs.uiClassicShowSourceList = value
+            afterSetWhenCloudSyncAutoPull()
+        }
+
+    private var _uiClassicShowAllChannels by mutableStateOf(Configs.uiClassicShowAllChannels)
+    var uiClassicShowAllChannels: Boolean
+        get() = _uiClassicShowAllChannels
+        set(value) {
+            _uiClassicShowAllChannels = value
+            Configs.uiClassicShowAllChannels = value
+            afterSetWhenCloudSyncAutoPull()
+        }
+
+    private var _uiClassicShowChannelInfo by mutableStateOf(Configs.uiClassicShowChannelInfo)
+    var uiClassicShowChannelInfo: Boolean
+        get() = _uiClassicShowChannelInfo
+        set(value) {
+            _uiClassicShowChannelInfo = value
+            Configs.uiClassicShowChannelInfo = value
             afterSetWhenCloudSyncAutoPull()
         }
 
@@ -573,6 +607,23 @@ class SettingsViewModel : ViewModel() {
             afterSetWhenCloudSyncAutoPull()
         }
 
+    private var _videoPlayerSupportTSHighProfile by mutableStateOf(false)
+    var videoPlayerSupportTSHighProfile: Boolean
+        get() = _videoPlayerSupportTSHighProfile
+        set(value) {
+            _videoPlayerSupportTSHighProfile = value
+            Configs.videoPlayerSupportTSHighProfile = value
+        }
+    
+    private var _videoPlayerExtractHeaderFromLink by mutableStateOf(false)
+    var videoPlayerExtractHeaderFromLink: Boolean
+        get() = _videoPlayerExtractHeaderFromLink
+        set(value) {
+            _videoPlayerExtractHeaderFromLink = value
+            Configs.videoPlayerExtractHeaderFromLink = value
+            afterSetWhenCloudSyncAutoPull()
+        }
+
     private var _videoPlayerVolumeNormalization by mutableStateOf(false)
     var videoPlayerVolumeNormalization: Boolean
         get() = _videoPlayerVolumeNormalization
@@ -665,7 +716,7 @@ class SettingsViewModel : ViewModel() {
             Configs.cloudSyncNetworkUrl = value
         }
 
-    private var _cloudSyncLocalFilePath by mutableStateOf("")
+    private var _cloudSyncLocalFilePath by mutableStateOf(Constants.DEFAULT_LOCAL_SYNC_FILE_PATH)
     var cloudSyncLocalFilePath: String
         get() = _cloudSyncLocalFilePath
         set(value) {
@@ -697,14 +748,85 @@ class SettingsViewModel : ViewModel() {
             Configs.cloudSyncWebDavPassword = value
         }
 
-    // private var _feiyangAllInOneFilePath by mutableStateOf("")
-    // var feiyangAllInOneFilePath: String
-    //     get() = _feiyangAllInOneFilePath
-    //     set(value) {
-    //         _feiyangAllInOneFilePath = value
-    //         Configs.feiyangAllInOneFilePath = value
-    //         afterSetWhenCloudSyncAutoPull()
-    //     }
+    private var _keyDownEventUp by mutableStateOf(KeyDownAction.ChangeCurrentChannelToPrev)
+    var keyDownEventUp: KeyDownAction
+        get() = _keyDownEventUp
+        set(value) {
+            _keyDownEventUp = value
+            Configs.keyDownEventUp = value
+        }
+
+    private var _keyDownEventDown by mutableStateOf(KeyDownAction.ChangeCurrentChannelToNext)
+    var keyDownEventDown: KeyDownAction
+        get() = _keyDownEventDown
+        set(value) {
+            _keyDownEventDown = value
+            Configs.keyDownEventDown = value
+        }
+
+    private var _keyDownEventLeft by mutableStateOf(KeyDownAction.ChangeCurrentChannelLineIdxToPrev)
+    var keyDownEventLeft: KeyDownAction
+        get() = _keyDownEventLeft
+        set(value) {
+            _keyDownEventLeft = value
+            Configs.keyDownEventLeft = value
+        }
+    
+    private var _keyDownEventRight by mutableStateOf(KeyDownAction.ChangeCurrentChannelLineIdxToNext)
+    var keyDownEventRight: KeyDownAction
+        get() = _keyDownEventRight
+        set(value) {
+            _keyDownEventRight = value
+            Configs.keyDownEventRight = value
+        }
+
+    private var _keyDownEventSelect by mutableStateOf(KeyDownAction.ToChannelScreen)
+    var keyDownEventSelect: KeyDownAction
+        get() = _keyDownEventSelect
+        set(value) {
+            _keyDownEventSelect = value
+            Configs.keyDownEventSelect = value
+        }
+
+    private var _keyDownEventLongUp by mutableStateOf(KeyDownAction.ToIptvSourceScreen)
+    var keyDownEventLongUp: KeyDownAction
+        get() = _keyDownEventLongUp
+        set(value) {
+            _keyDownEventLongUp = value
+            Configs.keyDownEventLongUp = value
+        }
+    
+    private var _keyDownEventLongDown by mutableStateOf(KeyDownAction.ToVideoPlayerControllerScreen)
+    var keyDownEventLongDown: KeyDownAction
+        get() = _keyDownEventLongDown
+        set(value) {
+            _keyDownEventLongDown = value
+            Configs.keyDownEventLongDown = value
+        }
+    
+    private var _keyDownEventLongLeft by mutableStateOf(KeyDownAction.ToEpgScreen)
+    var keyDownEventLongLeft: KeyDownAction
+        get() = _keyDownEventLongLeft
+        set(value) {
+            _keyDownEventLongLeft = value
+            Configs.keyDownEventLongLeft = value
+        }
+    
+    private var _keyDownEventLongRight by mutableStateOf(KeyDownAction.ToChannelLineScreen)
+    var keyDownEventLongRight: KeyDownAction
+        get() = _keyDownEventLongRight
+        set(value) {
+            _keyDownEventLongRight = value
+            Configs.keyDownEventLongRight = value
+        }
+    
+    private var _keyDownEventLongSelect by mutableStateOf(KeyDownAction.ToQuickOpScreen)
+    var keyDownEventLongSelect: KeyDownAction
+        get() = _keyDownEventLongSelect
+        set(value) {
+            _keyDownEventLongSelect = value
+            Configs.keyDownEventLongSelect = value
+        }
 
     private fun afterSetWhenCloudSyncAutoPull() {
         // if (_cloudSyncAutoPull) Snackbar.show("云同步：自动拉取已启用")
@@ -722,7 +844,6 @@ class SettingsViewModel : ViewModel() {
 
         _iptvChannelChangeListLoop = Configs.iptvChannelChangeListLoop
         _iptvChannelChangeCrossGroup = Configs.iptvChannelChangeCrossGroup
-        _iptvChannelChangeLineWithLeftRight = Configs.iptvChannelChangeLineWithLeftRight
         _epgEnable = Configs.epgEnable
     }
 
@@ -749,10 +870,10 @@ class SettingsViewModel : ViewModel() {
         _iptvChannelFavoriteEnable = Configs.iptvChannelFavoriteEnable
         _iptvChannelFavoriteListVisible = Configs.iptvChannelFavoriteListVisible
         _iptvChannelFavoriteList = Configs.iptvChannelFavoriteList
+        _iptvChannelHistoryList = Configs.iptvChannelHistoryList
         _iptvChannelLastPlay = Configs.iptvChannelLastPlay
         _iptvChannelLinePlayableHostList = Configs.iptvChannelLinePlayableHostList
         _iptvChannelLinePlayableUrlList = Configs.iptvChannelLinePlayableUrlList
-        _iptvChannelChangeFlip = Configs.iptvChannelChangeFlip
         _iptvChannelNoSelectEnable = Configs.iptvChannelNoSelectEnable
         _epgEnable = Configs.epgEnable
         _epgSourceCurrent = Configs.epgSourceCurrent
@@ -765,12 +886,25 @@ class SettingsViewModel : ViewModel() {
         _uiShowChannelLogo = Configs.uiShowChannelLogo
         _uiShowChannelPreview = Configs.uiShowChannelPreview
         _uiUseClassicPanelScreen = Configs.uiUseClassicPanelScreen
+        _uiClassicShowSourceList = Configs.uiClassicShowSourceList
+        _uiClassicShowAllChannels = Configs.uiClassicShowAllChannels
+        _uiClassicShowChannelInfo = Configs.uiClassicShowChannelInfo
         _uiDensityScaleRatio = Configs.uiDensityScaleRatio
         _uiFontScaleRatio = Configs.uiFontScaleRatio
         _uiVideoPlayerSubtitle = Configs.uiVideoPlayerSubtitle
         _uiTimeShowMode = Configs.uiTimeShowMode
         _uiFocusOptimize = Configs.uiFocusOptimize
         _uiScreenAutoCloseDelay = Configs.uiScreenAutoCloseDelay
+        _keyDownEventUp = Configs.keyDownEventUp
+        _keyDownEventDown = Configs.keyDownEventDown
+        _keyDownEventLeft = Configs.keyDownEventLeft
+        _keyDownEventRight = Configs.keyDownEventRight
+        _keyDownEventSelect = Configs.keyDownEventSelect
+        _keyDownEventLongUp = Configs.keyDownEventLongUp
+        _keyDownEventLongDown = Configs.keyDownEventLongDown
+        _keyDownEventLongLeft = Configs.keyDownEventLongLeft
+        _keyDownEventLongRight = Configs.keyDownEventLongRight
+        _keyDownEventLongSelect = Configs.keyDownEventLongSelect
         _updateForceRemind = Configs.updateForceRemind
         _updateAutoCheck = Configs.updateAutoCheck
         _updateChannel = Configs.updateChannel
@@ -785,6 +919,8 @@ class SettingsViewModel : ViewModel() {
         _videoPlayerForceSoftDecode = Configs.videoPlayerForceSoftDecode
         _videoPlayerStopPreviousMediaItem = Configs.videoPlayerStopPreviousMediaItem
         _videoPlayerSkipMultipleFramesOnSameVSync = Configs.videoPlayerSkipMultipleFramesOnSameVSync
+        _videoPlayerSupportTSHighProfile = Configs.videoPlayerSupportTSHighProfile
+        _videoPlayerExtractHeaderFromLink = Configs.videoPlayerExtractHeaderFromLink
         _networkRetryCount = Configs.networkRetryCount
         _networkRetryInterval = Configs.networkRetryInterval
         _themeAppCurrent = Configs.themeAppCurrent
@@ -799,7 +935,6 @@ class SettingsViewModel : ViewModel() {
         _cloudSyncWebDavUrl = Configs.cloudSyncWebDavUrl
         _cloudSyncWebDavUsername = Configs.cloudSyncWebDavUsername
         _cloudSyncWebDavPassword = Configs.cloudSyncWebDavPassword
-        // _feiyangAllInOneFilePath = Configs.feiyangAllInOneFilePath
         _videoPlayerVolumeNormalization = Configs.videoPlayerVolumeNormalization
     }
 

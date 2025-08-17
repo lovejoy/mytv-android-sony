@@ -18,11 +18,13 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.ListItemDefaults
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import top.yogiczy.mytv.core.util.utils.humanizeMs
+import top.yogiczy.mytv.core.util.utils.humanizeBufferNum
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.screen.components.AppScreen
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun SettingsVideoPlayerBufferTimeScreen(
@@ -38,13 +40,13 @@ fun SettingsVideoPlayerBufferTimeScreen(
 
     AppScreen(
         modifier = modifier.padding(top = 10.dp),
-        header = { Text("设置 / 播放器 / 缓存加载时间") },
+        header = { Text("${stringResource(R.string.ui_dashboard_module_settings)} / ${stringResource(R.string.ui_channel_view_player)} / ${stringResource(R.string.ui_player_view_buffer_time)}") },
         canBack = true,
         onBackPressed = onBackPressed,
     ) {
         LazyVerticalGrid(
             modifier = Modifier,
-            columns = GridCells.Fixed(6),
+            columns = GridCells.Fixed(5),
             contentPadding = childPadding.copy(top = 10.dp).paddingValues,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -55,7 +57,7 @@ fun SettingsVideoPlayerBufferTimeScreen(
                         .handleKeyEvents(onSelect = { onBufferTimeChanged(delay) }),
                     headlineContent = {
                         Text(
-                            delay.humanizeMs(),
+                            delay.humanizeBufferNum(),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                         )
@@ -78,7 +80,6 @@ fun SettingsVideoPlayerBufferTimeScreen(
         }
     }
 }
-
 
 @Preview(device = "id:Android TV (720p)")
 @Composable

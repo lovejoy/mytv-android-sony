@@ -58,6 +58,8 @@ import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.focusOnLaunched
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 import kotlin.math.roundToInt
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun AppScreen(
@@ -88,17 +90,19 @@ fun AppScreen(
     BackHandler { onBackPressed() }
     AppThemeWrapper {
         if (enableTopBarHidden) {
-            AppScaffoldTopBar(
-                modifier = Modifier
-                    .height(64.dp)
-                    .offset { IntOffset(x = 0, y = topBarYOffsetPx) }
-                    .onSizeChanged { topBarHeightPx = it.height },
-                header = header,
-                headerExtra = headerExtra,
-                canBack = canBack,
-                onBackPressed = onBackPressed,
-            )
-
+            Box(
+                modifier = Modifier.offset { IntOffset(x = 0, y = topBarYOffsetPx) },
+            ) {
+                AppScaffoldTopBar(
+                    modifier = Modifier
+                        .height(64.dp)
+                        .onSizeChanged { topBarHeightPx = it.height },
+                    header = header,
+                    headerExtra = headerExtra,
+                    canBack = canBack,
+                    onBackPressed = onBackPressed,
+                )
+            }
             Box(
                 modifier = modifier.offset { IntOffset(x = 0, y = contentPaddingPx) },
             ) {
@@ -147,7 +151,7 @@ private fun AppScaffoldTopBar(
                 if (canBack) {
                     AppScaffoldHeaderBtn(
                         modifier = Modifier.focusOnLaunched(),
-                        title = "返回",
+                        title = stringResource(R.string.ui_return),
                         imageVector = Icons.AutoMirrored.Default.ArrowBack,
                         onSelect = onBackPressed
                     )

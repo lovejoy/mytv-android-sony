@@ -32,12 +32,17 @@ plugins {
     alias(libs.plugins.sentry.android.gradle)
 }
 
+
 android {
     @Suppress("UNCHECKED_CAST")
     apply(extra["appConfig"] as BaseAppModuleExtension.() -> Unit)
 
     namespace = "top.yogiczy.mytv.tv"
     compileSdk = libs.versions.compileSdk.get().toInt()
+
+    androidResources {
+        generateLocaleConfig = true
+    }
 
     defaultConfig {
         applicationId = "top.yogiczy.slcs.sonytv"
@@ -61,10 +66,6 @@ android {
                 "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("release")
-
-            ndk {
-                abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
-            }
         }
         debug{
             isMinifyEnabled = false
@@ -72,18 +73,17 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            // 使用默认的debug签名配置，不需要keystore
-            ndk {
-                abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a"))
-            }
+            signingConfig = signingConfigs.getByName("release")
         }
     }
-
-    // sourceSets {
-    //     getByName("main") {
-    //         jniLibs.srcDirs("jniLibs")
-    //     }
-    // }
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true
+        }
+    }
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -155,9 +155,6 @@ dependencies {
     implementation(libs.androidx.media3.datasource.rtmp)
     implementation(libs.androidx.media3.exoplayer.smoothstreaming)
 
-    // implementation("com.github.CarGuo.GSYVideoPlayer:gsyvideoplayer-java:v10.1.0")
-    // implementation("com.github.CarGuo.GSYVideoPlayer:gsyvideoplayer-ex_so:v10.1.0")
-
     // 二维码
     implementation(libs.qrose)
 
@@ -186,7 +183,6 @@ sentry {
     org.set("mytv-android")
     projectName.set("mytv")
     authToken.set(getProperty("sentry.auth_token") ?: System.getenv("SENTRY_AUTH_TOKEN"))
-    ignoredBuildTypes.set(setOf("debug"))
     autoUploadProguardMapping = false
 }
 

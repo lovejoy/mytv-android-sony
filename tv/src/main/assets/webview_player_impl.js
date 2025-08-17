@@ -34,11 +34,13 @@ function removeVideoPlayerControl() {
 }
 
 function removeAllDivElements() {
+    
     [...document.body.children].forEach((element) => {
-        if (element.tagName.toLowerCase() == 'div' || element.tagName.toLowerCase() == 'section') {
-            console.info(element.innerHTML);
-            element.remove()
-        }
+        const tagName = element.tagName.toLowerCase()
+        if (tagName != 'script' && tagName != 'video'){
+            // element.remove();
+            element.style.display = 'none';
+        } 
     })
 }
 
@@ -76,7 +78,7 @@ function cleanAllStyle() {
 function __initializetMain() {
     let video = document.querySelector('video');
     video = video ? video : getVideoParentShadowRoots();
-    if (Date.now() - ___startTime > 15000) {
+    if (Date.now() - ___startTime > webview_player_timeout) {
         clearInterval(my_pollingIntervalId);
         try {
             video.pause();
@@ -95,5 +97,5 @@ function __initializetMain() {
         setInterval(enableVideo, 100, video); //2秒后再看一下
     }
  }
-cleanAllStyle();
+// cleanAllStyle();
 const my_pollingIntervalId = setInterval(__initializetMain, 100);

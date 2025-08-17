@@ -3,7 +3,9 @@ package top.yogiczy.mytv.tv.ui.utils
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.encodeToString
+import top.yogiczy.mytv.core.data.entities.actions.KeyDownAction
 import top.yogiczy.mytv.core.data.entities.channel.Channel
+import top.yogiczy.mytv.core.data.entities.channel.ChannelList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelFavoriteList
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeReserveList
 import top.yogiczy.mytv.core.data.entities.epgsource.EpgSource
@@ -40,7 +42,7 @@ object Configs {
         /** 打开直接进入直播 */
         APP_STARTUP_SCREEN,
 
-        /** ==================== 调式 ==================== */
+        /** ==================== 调试 ==================== */
         /** 开发者模式 */
         DEBUG_DEVELOPER_MODE,
 
@@ -53,17 +55,17 @@ object Configs {
         /** 显示布局网格 */
         DEBUG_SHOW_LAYOUT_GRIDS,
 
-        /** ==================== 播放源 ==================== */
-        /** 当前播放源 */
+        /** ==================== 订阅源 ==================== */
+        /** 当前订阅源 */
         IPTV_SOURCE_CURRENT,
 
-        /** 播放源列表 */
+        /** 订阅源列表 */
         IPTV_SOURCE_LIST,
 
-        /** 直播源缓存时间（毫秒） */
+        /** 订阅源缓存时间（毫秒） */
         IPTV_SOURCE_CACHE_TIME,
 
-        /** 播放源分组隐藏列表 */
+        /** 订阅源分组隐藏列表 */
         IPTV_CHANNEL_GROUP_HIDDEN_LIST,
 
         /** 网页源 */
@@ -84,26 +86,26 @@ object Configs {
         /** PLTV转换至TVOD */
         IPTV_PLTV_TO_TVOD,
 
-        /** 是否启用播放源频道收藏 */
+        /** 是否启用订阅源频道收藏 */
         IPTV_CHANNEL_FAVORITE_ENABLE,
 
-        /** 显示播放源频道收藏列表 */
+        /** 显示订阅源频道收藏列表 */
         IPTV_CHANNEL_FAVORITE_LIST_VISIBLE,
 
-        /** 播放源频道收藏列表 */
+        /** 订阅源频道收藏列表 */
         IPTV_CHANNEL_FAVORITE_LIST,
+
+        /** 频道历史记录 */
+        IPTV_CHANNEL_HISTORY_LIST,
 
         /** 上一次播放频道 */
         IPTV_CHANNEL_LAST_PLAY,
 
-        /** 直播源线路可播放host列表 */
+        /** 订阅源线路可播放host列表 */
         IPTV_CHANNEL_LINE_PLAYABLE_HOST_LIST,
 
-        /** 直播源线路可播放地址列表 */
+        /** 订阅源线路可播放地址列表 */
         IPTV_CHANNEL_LINE_PLAYABLE_URL_LIST,
-
-        /** 换台反转 */
-        IPTV_CHANNEL_CHANGE_FLIP,
 
         /** 是否启用数字选台 */
         IPTV_CHANNEL_NO_SELECT_ENABLE,
@@ -114,8 +116,37 @@ object Configs {
         /** 换台跨分组切换 **/
         IPTV_CHANNEL_CHANGE_CROSS_GROUP,
 
-        /** 左右键切换播放源线路 **/
-        IPTV_CHANNEL_CHANGE_LINE_WITH_LEFT_RIGHT,
+        /** ==================== 按键行为控制 ==================== */
+
+        /** 按键行为上键 */
+        KEYDOWN_EVENT_UP,
+
+        /** 按键行为下键 */
+        KEYDOWN_EVENT_DOWN,
+
+        /** 按键行为左键 */
+        KEYDOWN_EVENT_LEFT,
+
+        /** 按键行为右键 */
+        KEYDOWN_EVENT_RIGHT,
+
+        /** 按键行为选择键 */
+        KEYDOWN_EVENT_SELECT,
+
+        /** 按键行为长按上键 */
+        KEYDOWN_EVENT_LONG_UP,
+
+        /** 按键行为长按下键 */
+        KEYDOWN_EVENT_LONG_DOWN,
+
+        /** 按键行为长按左键 */
+        KEYDOWN_EVENT_LONG_LEFT,
+
+        /** 按键行为长按右键 */
+        KEYDOWN_EVENT_LONG_RIGHT,
+
+        /** 按键行为长按选择键 */
+        KEYDOWN_EVENT_LONG_SELECT,
 
         /** ==================== 节目单 ==================== */
         /** 启用节目单 */
@@ -130,7 +161,7 @@ object Configs {
         /** 节目单刷新时间阈值（小时） */
         EPG_REFRESH_TIME_THRESHOLD,
 
-        /** 节目单跟随播放源 */
+        /** 节目单跟随订阅源 */
         EPG_SOURCE_FOLLOW_IPTV,
 
         /** 节目预约列表 */
@@ -169,6 +200,15 @@ object Configs {
 
         /** 自动关闭界面延时 */
         UI_SCREEN_AUTO_CLOSE_DELAY,
+        
+        /** 经典选台界面显示订阅源列表 */
+        UI_CLASSIC_SHOW_SOURCE_LIST,
+        
+        /** 经典选台界面显示全部频道 */
+        UI_CLASSIC_SHOW_ALL_CHANNELS,
+        
+        /** 经典选台界面显示频道信息 */
+        UI_CLASSIC_SHOW_CHANNEL_INFO,
 
         /** ==================== 更新 ==================== */
         /** 更新强提醒 */
@@ -214,6 +254,12 @@ object Configs {
         /** 播放器 跳过同一VSync渲染多帧 */
         VIDEO_PLAYER_SKIP_MULTIPLE_FRAMES_ON_SAME_VSYNC,
 
+        /** 播放器 支持 TS 高级特性 */
+        VIDEO_PLAYER_SUPPORT_TS_HIGH_PROFILE,
+        
+        /** 播放器 支持在链接中提取 Header 信息 */
+        VIDEO_PLAYER_EXTRACT_HEADER_FROM_LINK,
+        
         /** 播放器音量均衡 */
         VIDEO_PLAYER_VOLUME_NORMALIZATION,
 
@@ -254,9 +300,6 @@ object Configs {
 
         /** 云同步 webdav 密码 */
         CLOUD_SYNC_WEBDAV_PASSWORD,
-
-        // /** 肥羊 AllInOne 文件路径 */
-        // FEIYANG_ALLINONE_FILE_PATH,
     }
 
     /** ==================== 应用 ==================== */
@@ -306,8 +349,8 @@ object Configs {
         get() = SP.getBoolean(KEY.DEBUG_SHOW_LAYOUT_GRIDS.name, false)
         set(value) = SP.putBoolean(KEY.DEBUG_SHOW_LAYOUT_GRIDS.name, value)
 
-    /** ==================== 播放源 ==================== */
-    /** 当前播放源 */
+    /** ==================== 订阅源 ==================== */
+    /** 当前订阅源 */
     var iptvSourceCurrent: IptvSource
         get() = Globals.json.decodeFromString(SP.getString(KEY.IPTV_SOURCE_CURRENT.name, "")
             .ifBlank {
@@ -315,19 +358,19 @@ object Configs {
             })
         set(value) = SP.putString(KEY.IPTV_SOURCE_CURRENT.name, Globals.json.encodeToString(value))
 
-    /** 播放源列表 */
+    /** 订阅源列表 */
     var iptvSourceList: IptvSourceList
         get() = Globals.json.decodeFromString(
-            SP.getString(KEY.IPTV_SOURCE_LIST.name, Globals.json.encodeToString(IptvSourceList()))
+            SP.getString(KEY.IPTV_SOURCE_LIST.name, Globals.json.encodeToString(Constants.IPTV_SOURCE_LIST))
         )
         set(value) = SP.putString(KEY.IPTV_SOURCE_LIST.name, Globals.json.encodeToString(value))
 
-    /** 直播源缓存时间（毫秒） */
+    /** 订阅源缓存时间（毫秒） */
     var iptvSourceCacheTime: Long
         get() = SP.getLong(KEY.IPTV_SOURCE_CACHE_TIME.name, Constants.IPTV_SOURCE_CACHE_TIME)
         set(value) = SP.putLong(KEY.IPTV_SOURCE_CACHE_TIME.name, value)
 
-    /** 播放源分组隐藏列表 */
+    /** 订阅源分组隐藏列表 */
     var iptvChannelGroupHiddenList: Set<String>
         get() = SP.getStringSet(KEY.IPTV_CHANNEL_GROUP_HIDDEN_LIST.name, emptySet())
         set(value) = SP.putStringSet(KEY.IPTV_CHANNEL_GROUP_HIDDEN_LIST.name, value)
@@ -364,17 +407,17 @@ object Configs {
         get() = SP.getBoolean(KEY.IPTV_PLTV_TO_TVOD.name, true)
         set(value) = SP.putBoolean(KEY.IPTV_PLTV_TO_TVOD.name, value)
 
-    /** 是否启用播放源频道收藏 */
+    /** 是否启用订阅源频道收藏 */
     var iptvChannelFavoriteEnable: Boolean
         get() = SP.getBoolean(KEY.IPTV_CHANNEL_FAVORITE_ENABLE.name, true)
         set(value) = SP.putBoolean(KEY.IPTV_CHANNEL_FAVORITE_ENABLE.name, value)
 
-    /** 显示播放源频道收藏列表 */
+    /** 显示订阅源频道收藏列表 */
     var iptvChannelFavoriteListVisible: Boolean
         get() = SP.getBoolean(KEY.IPTV_CHANNEL_FAVORITE_LIST_VISIBLE.name, false)
         set(value) = SP.putBoolean(KEY.IPTV_CHANNEL_FAVORITE_LIST_VISIBLE.name, value)
 
-    /** 播放源频道收藏列表 */
+    /** 订阅源频道收藏列表 */
     var iptvChannelFavoriteList: ChannelFavoriteList
         get() = Globals.json.decodeFromString(
             SP.getString(
@@ -384,6 +427,19 @@ object Configs {
         )
         set(value) = SP.putString(
             KEY.IPTV_CHANNEL_FAVORITE_LIST.name,
+            Globals.json.encodeToString(value)
+        )
+
+    /** 频道历史记录 */
+    var iptvChannelHistoryList: ChannelList
+        get() = Globals.json.decodeFromString(
+            SP.getString(
+                KEY.IPTV_CHANNEL_HISTORY_LIST.name,
+                Globals.json.encodeToString(ChannelList())
+            )
+        )
+        set(value) = SP.putString(
+            KEY.IPTV_CHANNEL_HISTORY_LIST.name,
             Globals.json.encodeToString(value)
         )
 
@@ -400,21 +456,16 @@ object Configs {
             Globals.json.encodeToString(value)
         )
 
-    /** 直播源线路可播放host列表 */
+    /** 订阅源线路可播放host列表 */
     var iptvChannelLinePlayableHostList: Set<String>
         get() = SP.getStringSet(KEY.IPTV_CHANNEL_LINE_PLAYABLE_HOST_LIST.name, emptySet())
         set(value) = SP.putStringSet(KEY.IPTV_CHANNEL_LINE_PLAYABLE_HOST_LIST.name, value)
 
-    /** 直播源线路可播放地址列表 */
+    /** 订阅源线路可播放地址列表 */
     // IPTV_CHANNEL_LINE_PLAYABLE_URL_LIST,
     var iptvChannelLinePlayableUrlList: Set<String>
         get() = SP.getStringSet(KEY.IPTV_CHANNEL_LINE_PLAYABLE_URL_LIST.name, emptySet())
         set(value) = SP.putStringSet(KEY.IPTV_CHANNEL_LINE_PLAYABLE_URL_LIST.name, value)
-
-    /** 换台反转 */
-    var iptvChannelChangeFlip: Boolean
-        get() = SP.getBoolean(KEY.IPTV_CHANNEL_CHANGE_FLIP.name, false)
-        set(value) = SP.putBoolean(KEY.IPTV_CHANNEL_CHANGE_FLIP.name, value)
 
     /** 是否启用数字选台 */
     var iptvChannelNoSelectEnable: Boolean
@@ -430,11 +481,6 @@ object Configs {
     var iptvChannelChangeCrossGroup: Boolean
         get() = SP.getBoolean(KEY.IPTV_CHANNEL_CHANGE_CROSS_GROUP.name, true)
         set(value) = SP.putBoolean(KEY.IPTV_CHANNEL_CHANGE_CROSS_GROUP.name, value)
-
-    /** 左右键切换播放源线路 **/
-    var iptvChannelChangeLineWithLeftRight: Boolean
-        get() = SP.getBoolean(KEY.IPTV_CHANNEL_CHANGE_LINE_WITH_LEFT_RIGHT.name, true)
-        set(value) = SP.putBoolean(KEY.IPTV_CHANNEL_CHANGE_LINE_WITH_LEFT_RIGHT.name, value)
 
     /** ==================== 节目单 ==================== */
     /** 启用节目单 */
@@ -466,7 +512,7 @@ object Configs {
         get() = SP.getInt(KEY.EPG_REFRESH_TIME_THRESHOLD.name, Constants.EPG_REFRESH_TIME_THRESHOLD)
         set(value) = SP.putInt(KEY.EPG_REFRESH_TIME_THRESHOLD.name, value)
 
-    /** 节目单跟随播放源 */
+    /** 节目单跟随订阅源 */
     var epgSourceFollowIptv: Boolean
         get() = SP.getBoolean(KEY.EPG_SOURCE_FOLLOW_IPTV.name, false)
         set(value) = SP.putBoolean(KEY.EPG_SOURCE_FOLLOW_IPTV.name, value)
@@ -510,6 +556,21 @@ object Configs {
         get() = SP.getBoolean(KEY.UI_USE_CLASSIC_PANEL_SCREEN.name, true)
         set(value) = SP.putBoolean(KEY.UI_USE_CLASSIC_PANEL_SCREEN.name, value)
 
+    /** 经典选台界面显示订阅源列表 */
+    var uiClassicShowSourceList: Boolean
+        get() = SP.getBoolean(KEY.UI_CLASSIC_SHOW_SOURCE_LIST.name, true)
+        set(value) = SP.putBoolean(KEY.UI_CLASSIC_SHOW_SOURCE_LIST.name, value)
+
+    /** 经典选台界面显示全部频道 */
+    var uiClassicShowAllChannels: Boolean
+        get() = SP.getBoolean(KEY.UI_CLASSIC_SHOW_ALL_CHANNELS.name, false)
+        set(value) = SP.putBoolean(KEY.UI_CLASSIC_SHOW_ALL_CHANNELS.name, value)
+
+    /** 经典选台界面显示频道信息 */
+    var uiClassicShowChannelInfo: Boolean
+        get() = SP.getBoolean(KEY.UI_CLASSIC_SHOW_CHANNEL_INFO.name, false)
+        set(value) = SP.putBoolean(KEY.UI_CLASSIC_SHOW_CHANNEL_INFO.name, value)
+
     /** 界面密度缩放比例 */
     var uiDensityScaleRatio: Float
         get() = SP.getFloat(KEY.UI_DENSITY_SCALE_RATIO.name, 0f)
@@ -549,6 +610,57 @@ object Configs {
     var uiScreenAutoCloseDelay: Long
         get() = SP.getLong(KEY.UI_SCREEN_AUTO_CLOSE_DELAY.name, Constants.UI_SCREEN_AUTO_CLOSE_DELAY)
         set(value) = SP.putLong(KEY.UI_SCREEN_AUTO_CLOSE_DELAY.name, value)
+
+    /** ==================== 按键行为控制 ==================== */
+    /** 按键行为上键 */
+    var keyDownEventUp: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_UP.name, KeyDownAction.ChangeCurrentChannelToPrev.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_UP.name, value.value)
+
+    /** 按键行为下键 */
+    var keyDownEventDown: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_DOWN.name, KeyDownAction.ChangeCurrentChannelToNext.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_DOWN.name, value.value)
+
+    /** 按键行为左键 */
+    var keyDownEventLeft: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_LEFT.name, KeyDownAction.ChangeCurrentChannelLineIdxToPrev.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_LEFT.name, value.value)
+
+    /** 按键行为右键 */
+    var keyDownEventRight: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_RIGHT.name, KeyDownAction.ChangeCurrentChannelLineIdxToNext.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_RIGHT.name, value.value)
+
+    /** 按键行为选择键 */
+    var keyDownEventSelect: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_SELECT.name, KeyDownAction.ToChannelScreen.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_SELECT.name, value.value)
+
+    /** 按键行为长按上键 */
+    var keyDownEventLongUp: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_LONG_UP.name, KeyDownAction.ToIptvSourceScreen.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_LONG_UP.name, value.value)
+
+    /** 按键行为长按下键 */
+    var keyDownEventLongDown: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_LONG_DOWN.name, KeyDownAction.ToVideoPlayerControllerScreen.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_LONG_DOWN.name, value.value)
+
+    /** 按键行为长按左键 */
+    var keyDownEventLongLeft: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_LONG_LEFT.name, KeyDownAction.ToEpgScreen.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_LONG_LEFT.name, value.value)
+
+    /** 按键行为长按右键 */
+    var keyDownEventLongRight: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_LONG_RIGHT.name, KeyDownAction.ToChannelLineScreen.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_LONG_RIGHT.name, value.value)
+
+    /** 按键行为长按选择键 */
+    var keyDownEventLongSelect: KeyDownAction
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_LONG_SELECT.name, KeyDownAction.ToQuickOpScreen.value))
+        set(value) = SP.putInt(KEY.KEYDOWN_EVENT_LONG_SELECT.name, value.value)
 
     /** ==================== 更新 ==================== */
     /** 更新强提醒 */
@@ -617,7 +729,7 @@ object Configs {
         )
         set(value) = SP.putInt(KEY.VIDEO_PLAYER_DISPLAY_MODE.name, value.value)
 
-    /** 播放器 强制软解 */
+    /** 播放器 强制音频软解 */
     var videoPlayerForceSoftDecode: Boolean
         get() = SP.getBoolean(KEY.VIDEO_PLAYER_FORCE_SOFT_DECODE.name, false)
         set(value) = SP.putBoolean(KEY.VIDEO_PLAYER_FORCE_SOFT_DECODE.name, value)
@@ -631,6 +743,16 @@ object Configs {
     var videoPlayerSkipMultipleFramesOnSameVSync: Boolean
         get() = SP.getBoolean(KEY.VIDEO_PLAYER_SKIP_MULTIPLE_FRAMES_ON_SAME_VSYNC.name, true)
         set(value) = SP.putBoolean(KEY.VIDEO_PLAYER_SKIP_MULTIPLE_FRAMES_ON_SAME_VSYNC.name, value)
+
+    /** 播放器 支持 TS 高级特性 */
+    var videoPlayerSupportTSHighProfile: Boolean
+        get() = SP.getBoolean(KEY.VIDEO_PLAYER_SUPPORT_TS_HIGH_PROFILE.name, false)
+        set(value) = SP.putBoolean(KEY.VIDEO_PLAYER_SUPPORT_TS_HIGH_PROFILE.name, value)
+
+    /** 播放器 支持在链接中提取 Header 信息 */
+    var videoPlayerExtractHeaderFromLink: Boolean
+        get() = SP.getBoolean(KEY.VIDEO_PLAYER_EXTRACT_HEADER_FROM_LINK.name, false)
+        set(value) = SP.putBoolean(KEY.VIDEO_PLAYER_EXTRACT_HEADER_FROM_LINK.name, value)
 
     /** 播放器音量均衡 */
     var videoPlayerVolumeNormalization: Boolean
@@ -687,7 +809,7 @@ object Configs {
 
     /** 云同步 本地文件 */
     var cloudSyncLocalFilePath: String
-        get() = SP.getString(KEY.CLOUD_SYNC_LOCAL_FILE.name, "")
+        get() = SP.getString(KEY.CLOUD_SYNC_LOCAL_FILE.name, Constants.DEFAULT_LOCAL_SYNC_FILE_PATH)
         set(value) = SP.putString(KEY.CLOUD_SYNC_LOCAL_FILE.name, value)
 
     /** 云同步 webdav url */
@@ -720,18 +842,23 @@ object Configs {
         get() = SP.getLong("network_retry_interval", Constants.NETWORK_RETRY_INTERVAL)
         set(value) = SP.putLong("network_retry_interval", value)
 
-    enum class UiTimeShowMode(val value: Int, val label: String) {
+    /** 经典选台界面上次选中分组名 */
+    var classicPanelLastSelectedGroupName: String?
+        get() = SP.getString("classicPanelLastSelectedGroupName", "").ifBlank { null }
+        set(value) = SP.putString("classicPanelLastSelectedGroupName", value ?: "")
+
+    enum class UiTimeShowMode(val value: Int) {
         /** 隐藏 */
-        HIDDEN(0, "隐藏"),
+        HIDDEN(0),
 
         /** 常显 */
-        ALWAYS(1, "常显"),
+        ALWAYS(1),
 
         /** 整点 */
-        EVERY_HOUR(2, "整点"),
+        EVERY_HOUR(2),
 
         /** 半点 */
-        HALF_HOUR(3, "半点");
+        HALF_HOUR(3);
 
         companion object {
             fun fromValue(value: Int): UiTimeShowMode {
@@ -740,15 +867,15 @@ object Configs {
         }
     }
 
-    enum class IptvHybridMode(val value: Int, val label: String) {
+    enum class IptvHybridMode(val value: Int) {
         /** 禁用 */
-        DISABLE(0, "禁用"),
+        DISABLE(0),
 
-        /** 直播源优先 */
-        IPTV_FIRST(1, "直播源优先"),
+        /** 订阅源优先 */
+        IPTV_FIRST(1),
 
         /** 网页源优先 */
-        HYBRID_FIRST(2, "网页源优先");
+        HYBRID_FIRST(2);
 
         companion object {
             fun fromValue(value: Int): IptvHybridMode {
@@ -823,10 +950,10 @@ object Configs {
             iptvChannelFavoriteEnable = iptvChannelFavoriteEnable,
             iptvChannelFavoriteListVisible = iptvChannelFavoriteListVisible,
             iptvChannelFavoriteList = iptvChannelFavoriteList,
+            iptvChannelHistoryList = iptvChannelHistoryList,
             iptvChannelLastPlay = iptvChannelLastPlay,
             iptvChannelLinePlayableHostList = iptvChannelLinePlayableHostList,
             iptvChannelLinePlayableUrlList = iptvChannelLinePlayableUrlList,
-            iptvChannelChangeFlip = iptvChannelChangeFlip,
             iptvChannelNoSelectEnable = iptvChannelNoSelectEnable,
             iptvChannelChangeListLoop = iptvChannelChangeListLoop,
             iptvChannelChangeCrossGroup = iptvChannelChangeCrossGroup,
@@ -847,6 +974,16 @@ object Configs {
             uiTimeShowMode = uiTimeShowMode,
             uiFocusOptimize = uiFocusOptimize,
             uiScreenAutoCloseDelay = uiScreenAutoCloseDelay,
+            keyDownEventUp = keyDownEventUp,
+            keyDownEventDown = keyDownEventDown,
+            keyDownEventLeft = keyDownEventLeft,
+            keyDownEventRight = keyDownEventRight,
+            keyDownEventSelect = keyDownEventSelect,
+            keyDownEventLongUp = keyDownEventLongUp,
+            keyDownEventLongDown = keyDownEventLongDown,
+            keyDownEventLongLeft = keyDownEventLongLeft,
+            keyDownEventLongRight = keyDownEventLongRight,
+            keyDownEventLongSelect = keyDownEventLongSelect,
             updateForceRemind = updateForceRemind,
             updateChannel = updateChannel,
             videoPlayerCore = videoPlayerCore,
@@ -860,6 +997,8 @@ object Configs {
             videoPlayerForceSoftDecode = videoPlayerForceSoftDecode,
             videoPlayerStopPreviousMediaItem = videoPlayerStopPreviousMediaItem,
             videoPlayerSkipMultipleFramesOnSameVSync = videoPlayerSkipMultipleFramesOnSameVSync,
+            videoPlayerSupportTSHighProfile = videoPlayerSupportTSHighProfile,
+            videoPlayerExtractHeaderFromLink = videoPlayerExtractHeaderFromLink,
             videoPlayerVolumeNormalization = videoPlayerVolumeNormalization,
             themeAppCurrent = themeAppCurrent,
             cloudSyncAutoPull = cloudSyncAutoPull,
@@ -876,6 +1015,7 @@ object Configs {
             // feiyangAllInOneFilePath = feiyangAllInOneFilePath,
             networkRetryCount = networkRetryCount,
             networkRetryInterval = networkRetryInterval,
+            classicPanelLastSelectedGroupName = classicPanelLastSelectedGroupName,
         )
     }
 
@@ -902,10 +1042,10 @@ object Configs {
         configs.iptvChannelFavoriteEnable?.let { iptvChannelFavoriteEnable = it }
         configs.iptvChannelFavoriteListVisible?.let { iptvChannelFavoriteListVisible = it }
         configs.iptvChannelFavoriteList?.let { iptvChannelFavoriteList = it }
+        configs.iptvChannelHistoryList?.let { iptvChannelHistoryList = it }
         configs.iptvChannelLastPlay?.let { iptvChannelLastPlay = it }
         configs.iptvChannelLinePlayableHostList?.let { iptvChannelLinePlayableHostList = it }
         configs.iptvChannelLinePlayableUrlList?.let { iptvChannelLinePlayableUrlList = it }
-        configs.iptvChannelChangeFlip?.let { iptvChannelChangeFlip = it }
         configs.iptvChannelNoSelectEnable?.let { iptvChannelNoSelectEnable = it }
         configs.iptvChannelChangeListLoop?.let { iptvChannelChangeListLoop = it }
         configs.iptvChannelChangeCrossGroup?.let { iptvChannelChangeCrossGroup = it }
@@ -928,6 +1068,16 @@ object Configs {
         configs.uiTimeShowMode?.let { uiTimeShowMode = it }
         configs.uiFocusOptimize?.let { uiFocusOptimize = it }
         configs.uiScreenAutoCloseDelay?.let { uiScreenAutoCloseDelay = it }
+        configs.keyDownEventUp?.let { keyDownEventUp = it }
+        configs.keyDownEventDown?.let { keyDownEventDown = it }
+        configs.keyDownEventLeft?.let { keyDownEventLeft = it }
+        configs.keyDownEventRight?.let { keyDownEventRight = it }
+        configs.keyDownEventSelect?.let { keyDownEventSelect = it }
+        configs.keyDownEventLongUp?.let { keyDownEventLongUp = it }
+        configs.keyDownEventLongDown?.let { keyDownEventLongDown = it }
+        configs.keyDownEventLongLeft?.let { keyDownEventLongLeft = it }
+        configs.keyDownEventLongRight?.let { keyDownEventLongRight = it }
+        configs.keyDownEventLongSelect?.let { keyDownEventLongSelect = it }
         configs.updateForceRemind?.let { updateForceRemind = it }
         configs.updateChannel?.let { updateChannel = it }
         configs.videoPlayerCore?.let { videoPlayerCore = it }
@@ -941,6 +1091,8 @@ object Configs {
         configs.videoPlayerForceSoftDecode?.let { videoPlayerForceSoftDecode = it }
         configs.videoPlayerStopPreviousMediaItem?.let { videoPlayerStopPreviousMediaItem = it }
         configs.videoPlayerSkipMultipleFramesOnSameVSync?.let { videoPlayerSkipMultipleFramesOnSameVSync = it }
+        configs.videoPlayerSupportTSHighProfile?.let { videoPlayerSupportTSHighProfile = it }
+        configs.videoPlayerExtractHeaderFromLink?.let { videoPlayerExtractHeaderFromLink = it }
         configs.videoPlayerVolumeNormalization?.let { videoPlayerVolumeNormalization = it }
         configs.themeAppCurrent?.let { themeAppCurrent = it }
         configs.cloudSyncAutoPull?.let { cloudSyncAutoPull = it }
@@ -957,6 +1109,7 @@ object Configs {
         // configs.feiyangAllInOneFilePath?.let { feiyangAllInOneFilePath = it }
         configs.networkRetryCount?.let { networkRetryCount = it }
         configs.networkRetryInterval?.let { networkRetryInterval = it }
+        configs.classicPanelLastSelectedGroupName?.let { classicPanelLastSelectedGroupName = it }
     }
 
     @Serializable
@@ -983,10 +1136,10 @@ object Configs {
         val iptvChannelFavoriteEnable: Boolean? = null,
         val iptvChannelFavoriteListVisible: Boolean? = null,
         val iptvChannelFavoriteList: ChannelFavoriteList? = null,
+        val iptvChannelHistoryList: ChannelList? = null,
         val iptvChannelLastPlay: Channel? = null,
         val iptvChannelLinePlayableHostList: Set<String>? = null,
         val iptvChannelLinePlayableUrlList: Set<String>? = null,
-        val iptvChannelChangeFlip: Boolean? = null,
         val iptvChannelNoSelectEnable: Boolean? = null,
         val iptvChannelChangeListLoop: Boolean? = null,
         val iptvChannelChangeCrossGroup: Boolean? = null,
@@ -1007,6 +1160,16 @@ object Configs {
         val uiTimeShowMode: UiTimeShowMode? = null,
         val uiFocusOptimize: Boolean? = null,
         val uiScreenAutoCloseDelay: Long? = null,
+        val keyDownEventUp: KeyDownAction? = null,
+        val keyDownEventDown: KeyDownAction? = null,
+        val keyDownEventLeft: KeyDownAction? = null,
+        val keyDownEventRight: KeyDownAction? = null,
+        val keyDownEventSelect: KeyDownAction? = null,
+        val keyDownEventLongUp: KeyDownAction? = null,
+        val keyDownEventLongDown: KeyDownAction? = null,
+        val keyDownEventLongLeft: KeyDownAction? = null,
+        val keyDownEventLongRight: KeyDownAction? = null,
+        val keyDownEventLongSelect: KeyDownAction? = null,
         val updateForceRemind: Boolean? = null,
         val updateChannel: String? = null,
         val videoPlayerCore: VideoPlayerCore? = null,
@@ -1020,6 +1183,8 @@ object Configs {
         val videoPlayerForceSoftDecode: Boolean? = null,
         val videoPlayerStopPreviousMediaItem: Boolean? = null,
         val videoPlayerSkipMultipleFramesOnSameVSync: Boolean? = null,
+        val videoPlayerSupportTSHighProfile: Boolean? = null,
+        val videoPlayerExtractHeaderFromLink: Boolean? = null,
         val videoPlayerVolumeNormalization : Boolean? = null,
         val themeAppCurrent: AppThemeDef? = null,
         val cloudSyncAutoPull: Boolean? = null,
@@ -1036,19 +1201,27 @@ object Configs {
         // val feiyangAllInOneFilePath: String? = null,
         val networkRetryCount: Long? = null,
         val networkRetryInterval: Long? = null,
+        val classicPanelLastSelectedGroupName: String? = null,
     ) {
         fun desensitized() = copy(
             cloudSyncAutoPull = null,
             cloudSyncProvider = null,
-            cloudSyncGithubGistId = null,
-            cloudSyncGithubGistToken = null,
-            cloudSyncGiteeGistId = null,
-            cloudSyncGiteeGistToken = null,
-            cloudSyncNetworkUrl = null,
-            cloudSyncLocalFilePath = null,
-            cloudSyncWebDavUrl = null,
-            cloudSyncWebDavUsername = null,
-            cloudSyncWebDavPassword = null,
+            uiFocusOptimize = null,
+            videoPlayerCore = null,
+            webViewCore = null,
+            iptvChannelHistoryList = null,
+            iptvChannelFavoriteList = null,
+            videoPlayerForceSoftDecode = null,
+            videoPlayerSupportTSHighProfile = null,
+            // cloudSyncGithubGistId = null,
+            // cloudSyncGithubGistToken = null,
+            // cloudSyncGiteeGistId = null,
+            // cloudSyncGiteeGistToken = null,
+            // cloudSyncNetworkUrl = null,
+            // cloudSyncLocalFilePath = null,
+            // cloudSyncWebDavUrl = null,
+            // cloudSyncWebDavUsername = null,
+            // cloudSyncWebDavPassword = null,
             iptvChannelLastPlay = null,
             iptvChannelLinePlayableHostList = null,
             iptvChannelLinePlayableUrlList = null,

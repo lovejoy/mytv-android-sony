@@ -22,6 +22,8 @@ import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.screen.components.AppScreen
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun SettingsNetworkRetryCountScreen(
@@ -32,11 +34,11 @@ fun SettingsNetworkRetryCountScreen(
 ) {
     val childPadding = rememberChildPadding()
     val currentCount = countProvider()
-    val countList = listOf(5L, 10L, 15L, 20L, 25L, 30L, 35L, 40L, 45L, 50L)
+    val countList = listOf(1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 15L, 20L, 30L, 40L, 50L)
 
     AppScreen(
         modifier = modifier.padding(top = 10.dp),
-        header = { Text("设置 / 网络 / HTTP请求重试次数") },
+        header = { Text("${stringResource(R.string.ui_dashboard_module_settings)} / ${stringResource(R.string.ui_channel_view_network)} / ${stringResource(R.string.ui_network_retry_count)}") },
         canBack = true,
         onBackPressed = onBackPressed,
     ) {

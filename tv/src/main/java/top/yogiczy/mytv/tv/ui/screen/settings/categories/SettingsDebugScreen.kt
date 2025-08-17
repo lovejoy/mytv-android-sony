@@ -11,35 +11,39 @@ import top.yogiczy.mytv.tv.ui.screen.settings.components.SettingsCategoryScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.components.SettingsListItem
 import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun SettingsDebugScreen(
     modifier: Modifier = Modifier,
     settingsViewModel: SettingsViewModel = settingsVM,
+    toUiSettingsDecoderInfoScreen: () -> Unit = {},
     onBackPressed: () -> Unit = {},
 ) {
     SettingsCategoryScreen(
         modifier = modifier,
-        header = { Text("设置 / 调试") },
+        header = { Text("${stringResource(R.string.ui_dashboard_module_settings)} / ${stringResource(R.string.ui_channel_view_debug)}") },
         onBackPressed = onBackPressed,
     ) { firstItemFocusRequester ->
-        item {
-            SettingsListItem(
-                modifier = Modifier.focusRequester(firstItemFocusRequester),
-                headlineContent = "开发者模式",
-                trailingContent = {
-                    Switch(settingsViewModel.debugDeveloperMode, null)
-                },
-                onSelect = {
-                    settingsViewModel.debugDeveloperMode = !settingsViewModel.debugDeveloperMode
-                },
-            )
-        }
+        // item {
+        //     SettingsListItem(
+        //         modifier = Modifier.focusRequester(firstItemFocusRequester),
+        //         headlineContent = "开发者模式",
+        //         trailingContent = {
+        //             Switch(settingsViewModel.debugDeveloperMode, null)
+        //         },
+        //         onSelect = {
+        //             settingsViewModel.debugDeveloperMode = !settingsViewModel.debugDeveloperMode
+        //         },
+        //     )
+        // }
 
         item {
             SettingsListItem(
-                headlineContent = "显示FPS",
-                supportingContent = "在屏幕左上角显示fps和柱状图",
+                modifier = Modifier.focusRequester(firstItemFocusRequester),
+                headlineContent = stringResource(R.string.ui_debug_show_fps),
+                supportingContent = stringResource(R.string.ui_debug_show_fps_desc),
                 trailingContent = {
                     Switch(settingsViewModel.debugShowFps, null)
                 },
@@ -51,8 +55,8 @@ fun SettingsDebugScreen(
 
         item {
             SettingsListItem(
-                headlineContent = "显示播放器信息",
-                supportingContent = "显示播放器详细信息（编码、解码器、采样率等）",
+                headlineContent = stringResource(R.string.ui_debug_show_player_metadata),
+                supportingContent = stringResource(R.string.ui_debug_show_player_metadata_desc),
                 trailingContent = {
                     Switch(settingsViewModel.debugShowVideoPlayerMetadata, null)
                 },
@@ -65,7 +69,7 @@ fun SettingsDebugScreen(
 
         item {
             SettingsListItem(
-                headlineContent = "显示布局网格",
+                headlineContent = stringResource(R.string.ui_debug_show_layout_grids),
                 trailingContent = {
                     Switch(settingsViewModel.debugShowLayoutGrids, null)
                 },
@@ -73,6 +77,15 @@ fun SettingsDebugScreen(
                     settingsViewModel.debugShowLayoutGrids =
                         !settingsViewModel.debugShowLayoutGrids
                 },
+            )
+        }
+
+        item {
+            SettingsListItem(
+                headlineContent = stringResource(R.string.ui_debug_decoder_info),
+                supportingContent = stringResource(R.string.ui_debug_decoder_info_desc),
+                onSelect = toUiSettingsDecoderInfoScreen,
+                link = true,
             )
         }
     }

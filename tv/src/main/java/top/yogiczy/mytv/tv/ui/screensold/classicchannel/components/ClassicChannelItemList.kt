@@ -85,7 +85,10 @@ fun ClassicChannelItemList(
     val itemFocusRequesterList =
         remember(channelList) { List(channelList.size) { FocusRequester() } }
 
-    var hasFocused by rememberSaveable { mutableStateOf(!channelList.contains(initialChannel)) }
+    var hasFocused by rememberSaveable{
+        mutableStateOf((!channelList.contains(initialChannel)))
+    }
+    
     var focusedChannel by remember(channelList) {
         mutableStateOf(
             if (hasFocused) channelList.firstOrNull() ?: Channel() else initialChannel
@@ -242,12 +245,13 @@ private fun ClassicChannelItem(
                         modifier = Modifier.align(Alignment.Center),
                         channelProvider = { channel },
                     ) {
-                        Surface(
-                            modifier = modifier.fillMaxSize(),
-                            colors = SurfaceDefaults.colors(
-                                containerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
-                            ),
-                            shape = MaterialTheme.shapes.small,
+                        Box(
+                            modifier = modifier
+                                .fillMaxSize()
+                                .background(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(0.1f),
+                                    shape = MaterialTheme.shapes.small
+                                )
                         ) {
                             Text(
                                 channel.no,

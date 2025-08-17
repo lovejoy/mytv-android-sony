@@ -18,7 +18,8 @@ import tv.danmaku.ijk.media.player.IjkMediaMeta
 import tv.danmaku.ijk.media.player.IjkMediaPlayer
 import top.yogiczy.mytv.core.data.utils.Logger
 import top.yogiczy.mytv.core.data.utils.Loggable
-
+import kotlin.math.max
+import kotlin.text.Regex
 
 class IjkVideoPlayer(
     private val context: Context,
@@ -43,7 +44,7 @@ class IjkVideoPlayer(
             setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "analyzemaxduration", 100L)
             setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "analyzeduration", 1)
             setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "probesize", 1024 * 10)
-            setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "nobuffer")
+            setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "fflags", "fastseek")
         }
     }
     private var cacheSurfaceView: SurfaceView? = null
@@ -61,9 +62,9 @@ class IjkVideoPlayer(
                 setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-hevc", 1)
                 setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "mediacodec-handle-resolution-change", 1)
             }
-            setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "protocol_whitelist", "crypto,file,http,https,tcp,tls,udp,rtmp,rtsp")
+            setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "protocol_whitelist", "crypto,file,dash,http,https,rtp,tcp,tls,udp,rtmp,rtsp,data")
             setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "opensles", 0)
-            setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 50)
+            setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "framedrop", 5)
             setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "fast", 1)
             setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "start-on-prepared", 1)
             setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "enable-accurate-seek", 1)
@@ -74,9 +75,12 @@ class IjkVideoPlayer(
             setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "buffer_size", 1316)
             setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "infbuf", 1)  // 无限读
             setOption(IjkMediaPlayer.OPT_CATEGORY_FORMAT, "flush_packets", 1L)
+            setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "min-frames", 
+                    max(10L, (Configs.videoPlayerBufferTime.toLong() * 0.03).toLong())
+            )
 
             //  关闭播放器缓冲，这个必须关闭，否则会出现播放一段时间后，一直卡住，控制台打印 FFP_MSG_BUFFERING_START
-            setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", Configs.videoPlayerBufferTime.toLong())
+            setOption(IjkMediaPlayer.OPT_CATEGORY_PLAYER, "packet-buffering", 0)
 
             //https://www.cnblogs.com/Fitz/p/18537127
             // setOption(IjkMediaPlayer.OPT_CATEGORY_CODEC, "skip_loop_filter",0) //丢弃一些“无用”的数据包，例如AVI格式中的零大小数据包
@@ -86,18 +90,37 @@ class IjkVideoPlayer(
 
     override fun prepare(line: ChannelLine) {
         player.reset()
+        var uri = line.playableUrl
+        var header: Map<String, String> = emptyMap()
+        if(Configs.videoPlayerExtractHeaderFromLink){
+            val regex = Regex("""^([^|]+)\|([^|=]*=[^|=]*(\|[^|=]*=[^|=]*)*)$""")
+            val match = regex.find(uri.toString())
+            if (match != null) {
+                val realUrl = match.groupValues[1]
+                val headerStr = match.groupValues[2]
+                uri = realUrl
+                // 解析header
+                header = headerStr.split("|")
+                    .mapNotNull {
+                        val idx = it.indexOf("=")
+                        if (idx > 0) it.substring(0, idx) to it.substring(idx + 1) else null
+                    }
+                    .toMap()
+            }
+        }
         val headers = Configs.videoPlayerHeaders.toHeaders() + mapOf(
             "User-Agent" to (line.httpUserAgent ?: Configs.videoPlayerUserAgent),
             "Referer" to (line.httpReferrer ?: ""),
             "Origin" to (line.httpOrigin ?: ""),
-        ).filterValues { it.isNotEmpty() }
+            "Cookie" to (line.httpCookie ?: ""),
+        ).filterValues { it.isNotEmpty() } + header
         
         // 使用应用内日志系统
-        logger.i("播放地址: ${line.playableUrl}")
+        logger.i("播放地址: ${uri.toString()}")
         logger.i("请求头: $headers")
         
         player.setDataSource(
-            line.playableUrl,
+            uri,
             headers
         )
         setOption()

@@ -30,14 +30,17 @@ fun ChannelsChannelGroupItem(
 ) {
     val channelGroup = channelGroupProvider()
     val isSelected = isSelectedProvider()
-
     Surface(
-        modifier = modifier.handleKeyEvents(onSelect = onChannelGroupSelected),
+        modifier = modifier
+            .handleKeyEvents(
+                onSelect = onChannelGroupSelected,
+                onLongSelect = onChannelGroupSelected
+            ),
         shape = ClickableSurfaceDefaults.shape(MaterialTheme.shapes.extraLarge),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
         ),
-        onClick = {},
+        onClick = { onChannelGroupSelected() },
     ) {
         Row(
             modifier = Modifier

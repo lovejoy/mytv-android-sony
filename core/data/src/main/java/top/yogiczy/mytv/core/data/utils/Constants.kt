@@ -28,19 +28,25 @@ object Constants {
     const val GROUP_TELEGRAM = "https://t.me/mytv_android_channel"
 
     /**
-     * 播放源
+     * 订阅源
      */
     val IPTV_SOURCE_LIST = IptvSourceList(
         listOf(
             IptvSource(
-                name = "默认直播源 iptv-api",
+                name = "默认订阅源 iptv-api",
                 url = "https://gitee.com/mytv-android/iptv-api/raw/master/output/result.m3u",
+            ),
+            IptvSource(
+                name = "WebView订阅源",
+                url = "https://gitee.com/mytv-android/iptv-api/raw/master/output/webview.m3u",
             )
         )
     )
+    /*  历史列表大小 */
+    const val MAX_CHANNEL_HISTORY_SIZE = 15
 
     /**
-     * 播放源缓存时间（毫秒）
+     * 订阅源缓存时间（毫秒）
      */
     const val IPTV_SOURCE_CACHE_TIME = 1000 * 60 * 60 * 24L // 24小时
 
@@ -54,7 +60,7 @@ object Constants {
                 url = "https://epg.51zmt.top:8001/e.xml",
             ),
             EpgSource(
-                name = "mytvEPG",
+                name = "默认节目单 综合",
                 url = "https://gitee.com/mytv-android/myepg/raw/master/output/epg.gz"
             )
         )
@@ -80,7 +86,7 @@ object Constants {
      * {name|uppercase} 转成大写
      *
      */
-    const val CHANNEL_LOGO_PROVIDER = "https://gcore.jsdelivr.net/gh/taksssss/tv/icon/{name|uppercase}.png"
+    const val CHANNEL_LOGO_PROVIDER = "https://gitee.com/mytv-android/myTVlogo/raw/main/img/{name|uppercase}.png"
 
     /**
      * GitHub加速代理地址
@@ -140,4 +146,6 @@ object Constants {
      * 界面 时间显示前后范围
      */
     const val UI_TIME_SCREEN_SHOW_DURATION = 1000L * 30 // 前后30秒
+
+    const val DEFAULT_LOCAL_SYNC_FILE_PATH =  "file:///storage/emulated/0/Download/"
 }

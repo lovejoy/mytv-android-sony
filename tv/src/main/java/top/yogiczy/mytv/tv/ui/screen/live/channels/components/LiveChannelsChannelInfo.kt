@@ -52,11 +52,13 @@ import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.gridColumns
+import top.yogiczy.mytv.tv.ui.utils.getHybridWebViewUrlTagName
 import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.roundToInt
-
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
 @Composable
 fun LiveChannelsChannelInfo(
     modifier: Modifier = Modifier,
@@ -165,11 +167,11 @@ private fun LiveChannelsChannelInfoTags(
         )
 
         if (isInTimeShift) {
-            Tag("时移", colors = tagColors)
+            Tag(stringResource(R.string.ui_channel_info_time_shift), colors = tagColors)
         }
 
         if (line.playbackType != null || currentPlaybackEpgProgramme != null) {
-            Tag("回放", colors = tagColors)
+            Tag(stringResource(R.string.ui_channel_info_replay), colors = tagColors)
         }
 
         if (channel.lineList.size > 1) {
@@ -177,7 +179,10 @@ private fun LiveChannelsChannelInfoTags(
         }
 
         if (line.hybridType == ChannelLine.HybridType.WebView) {
-            Tag(ChannelUtil.getHybridWebViewUrlProvider(line.url), colors = tagColors)
+            Tag(
+                getHybridWebViewUrlTagName(ChannelUtil.getHybridWebViewUrlProvider(line.url)),
+                colors = tagColors
+            )
         } else {
             if (line.url.isIPv6()) Tag("IPv6", colors = tagColors)
         }
@@ -333,7 +338,7 @@ private fun LiveChannelsChannelInfoEpgProgramme(
                 )
 
                 Text(
-                    "精彩节目",
+                    stringResource(R.string.ui_excellent_program),
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.alpha(0.8f),
                     maxLines = 1,
@@ -355,36 +360,55 @@ private fun LiveChannelsChannelInfoEpgProgramme(
             modifier = Modifier.alpha(0.8f),
             maxLines = 1,
         )
-
-        if (showProgress) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            horizontalAlignment = Alignment.Start,
+        ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = modifier,
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                ProgressBar(
-                    process = programme.progress(),
-                    modifier = Modifier.size(60.dp, 5.dp),
-                    colors = ProgressBarColors(
-                        barColor = MaterialTheme.colorScheme.onSurface.copy(0.2f),
-                        progressColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                )
+                if (showProgress) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        ProgressBar(
+                            process = programme.progress(),
+                            modifier = Modifier.size(60.dp, 5.dp),
+                            colors = ProgressBarColors(
+                                barColor = MaterialTheme.colorScheme.onSurface.copy(0.2f),
+                                progressColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                        )
 
+                        Text(
+                            "${programme.remainingMinutes()}${stringResource(R.string.ui_minutes)}",
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.alpha(0.8f),
+                        )
+                    }
+                }
                 Text(
-                    "${programme.remainingMinutes()}分钟",
-                    style = MaterialTheme.typography.labelLarge,
+                    programme.title,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.alpha(0.8f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            if(!programme.description.isEmpty()) {
+                Text(
+                    programme.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.alpha(0.8f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
-
-        Text(
-            programme.title,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.alpha(0.8f),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
     }
 }
 

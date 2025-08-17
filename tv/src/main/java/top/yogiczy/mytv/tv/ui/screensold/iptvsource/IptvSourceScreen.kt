@@ -34,6 +34,9 @@ import top.yogiczy.mytv.core.data.repositories.iptv.IptvRepository
 import top.yogiczy.mytv.tv.ui.screensold.iptvsource.components.IptvSourceItemList
 import top.yogiczy.mytv.tv.ui.screensold.components.rememberScreenAutoCloseState
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.IptvSourceDetail
+import top.yogiczy.mytv.tv.R
+import androidx.compose.ui.res.stringResource
+
 @Composable
 fun IptvSourceScreen(
     modifier: Modifier = Modifier,
@@ -75,14 +78,14 @@ fun IptvSourceScreen(
         position = DrawerPosition.End,
         header = { 
             Row(
-                modifier = Modifier.width(270.dp),
+                modifier = Modifier.width(200.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "播放源",
+                    text = stringResource(R.string.ui_channel_view_source),
                 )
                 AppScaffoldHeaderBtn(
-                    title = "刷新",
+                    title = stringResource(R.string.ui_channel_view_refresh),
                     imageVector = Icons.Default.Refresh,
                     onSelect = {
                         coroutineScope.launch {
