@@ -53,6 +53,10 @@ object Constants {
                 name = "默认节目单 老张",
                 url = "https://epg.51zmt.top:8001/e.xml",
             ),
+            EpgSource(
+                name = "mytvEPG",
+                url = "https://gitee.com/mytv-android/myepg/raw/master/output/epg.gz"
+            )
         )
     )
 
