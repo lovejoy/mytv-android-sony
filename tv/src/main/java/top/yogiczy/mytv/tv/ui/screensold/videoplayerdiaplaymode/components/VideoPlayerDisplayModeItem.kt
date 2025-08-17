@@ -11,6 +11,7 @@ import androidx.tv.material3.ListItem
 import androidx.tv.material3.RadioButton
 import androidx.tv.material3.Text
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.VideoPlayerDisplayMode
+import top.yogiczy.mytv.tv.ui.screensold.videoplayer.getLocalizedLabel
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.focusOnLaunchedSaveable
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
@@ -32,7 +33,7 @@ fun VideoPlayerDisplayModeItem(
             .handleKeyEvents(onSelect = onSelected),
         selected = false,
         onClick = {},
-        headlineContent = { Text(displayMode.label) },
+        headlineContent = { Text(displayMode.getLocalizedLabel()) },
         trailingContent = {
             RadioButton(selected = isSelected, onClick = {})
         },

@@ -426,7 +426,7 @@ fun MainContent(
             onApplyToGlobal = {
                 mainContentState.isVideoPlayerDisplayModeScreenVisible = false
                 settingsViewModel.videoPlayerDisplayMode = videoPlayerState.displayMode
-                Snackbar.show("已应用到全局")
+                Snackbar.show(context.getString(top.yogiczy.mytv.tv.R.string.ui_video_applied_to_global))
             },
             onClose = { mainContentState.isVideoPlayerDisplayModeScreenVisible = false },
         )

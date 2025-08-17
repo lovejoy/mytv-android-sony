@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
@@ -18,12 +19,11 @@ import top.yogiczy.mytv.core.data.entities.channel.Channel
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.VideoPlayerDisplayMode
+import top.yogiczy.mytv.tv.ui.screensold.videoplayer.getLocalizedLabel
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.Configs
 import top.yogiczy.mytv.tv.ui.utils.focusOnLaunched
-import top.yogiczy.mytv.core.util.utils.humanizeLanguage
-import top.yogiczy.mytv.core.util.utils.humanizeAudioChannels
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
@@ -71,6 +71,7 @@ fun QuickOpBtnList(
     onClearCache: () -> Unit = {},
     onUserAction: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val childPadding = rememberChildPadding()
     val listState = rememberLazyListState()
     val playerMetadata = playerMetadataProvider()
@@ -138,7 +139,7 @@ fun QuickOpBtnList(
 
             item {
                 QuickOpBtn(
-                    title = settingsViewModel.videoPlayerDisplayMode.label,
+                    title = settingsViewModel.videoPlayerDisplayMode.getLocalizedLabel(),
                     imageVector = Icons.Filled.AspectRatio,
                     onSelect = onShowVideoPlayerDisplayMode,
                 )
@@ -168,7 +169,7 @@ fun QuickOpBtnList(
             if (playerMetadata.videoTracks.isNotEmpty()) {
                 item {
                     QuickOpBtn(
-                        title = playerMetadataProvider().video?.shortLabel ?: stringResource(R.string.ui_channel_view_video_track),
+                        title = playerMetadataProvider().video?.getShortLabel() ?: stringResource(R.string.ui_channel_view_video_track),
                         imageVector = Icons.Filled.VideoLibrary,
                         onSelect = onShowVideoTracks,
                     )
@@ -178,7 +179,7 @@ fun QuickOpBtnList(
             if (playerMetadata.audioTracks.isNotEmpty()) {
                 item {
                     QuickOpBtn(
-                        title = playerMetadataProvider().audio?.shortLabel ?: stringResource(R.string.ui_channel_view_audio_track),
+                        title = playerMetadataProvider().audio?.getShortLabel(context) ?: stringResource(R.string.ui_channel_view_audio_track),
                         imageVector = Icons.Filled.MusicNote,
                         onSelect = onShowAudioTracks,
                     )
@@ -188,7 +189,7 @@ fun QuickOpBtnList(
             if (playerMetadata.subtitleTracks.isNotEmpty()) {
                 item {
                     QuickOpBtn(
-                        title = playerMetadataProvider().subtitle?.shortLabel ?: stringResource(R.string.ui_channel_view_subtitle),
+                        title = playerMetadataProvider().subtitle?.getShortLabel(context) ?: stringResource(R.string.ui_channel_view_subtitle),
                         imageVector = Icons.Filled.Subtitles,
                         onSelect = onShowSubtitleTracks,
                     )

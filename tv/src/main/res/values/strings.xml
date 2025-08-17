@@ -72,6 +72,7 @@
     <string name="ui_crash_handler_tip">提示：您可以点击上方的\"复制日志\"按钮复制完整崩溃信息，以便报告问题。</string>
     <string name="ui_return">返回</string>
     <string name="ui_excellent_program">精彩节目</string>
+    <string name="ui_program_title">节目标题</string>
     <string name="ui_minutes">分钟</string>
     <string name="ui_favorites_empty">没有收藏的频道</string>
     <string name="ui_channel_empty">尚未加载列表</string>
@@ -359,7 +360,89 @@
     <string name="ui_language_setting_support">选择应用显示语言</string>
     <string name="ui_language_follow_system">跟随系统</string>
     <string name="ui_language_chinese">中文</string>
-    <string name="ui_language_english">English</string>
+    <string name="ui_language_simplified_chinese">简体中文</string>
+    <string name="ui_language_english">英语</string>
+    <string name="ui_audio_dolby_atmos_7_1_2">7.1.2 杜比全景声</string>
+    <string name="ui_audio_dolby_atmos_7_1_4">7.1.4 杜比全景声</string>
+    <string name="ui_audio_channels_format">%d声道</string>
+
+    <!-- 云同步相关 -->
+    <string name="ui_cloud_sync_pull_supported">支持拉取</string>
+    <string name="ui_cloud_sync_push_supported">支持推送</string>
+    <string name="ui_cloud_sync_pull_not_supported">不支持拉取</string>
+    <string name="ui_cloud_sync_push_not_supported">不支持推送</string>
+
+    <!-- 频道相关 -->
+    <string name="ui_channel_subscription_source">订阅源</string>
+    <string name="ui_channel_count_suffix">个频道</string>
+
+    <!-- 崩溃处理相关 -->
+    <string name="ui_crash_device_id">设备ID</string>
+    <string name="ui_crash_time">崩溃时间</string>
+
+    <!-- 视频播放器错误 -->
+    <string name="ui_video_playback_failed">播放失败</string>
+    <string name="ui_video_error_unsupported_type">不支持的视频类型，请检查视频源。</string>
+    <string name="ui_video_error_load_timeout">加载超时，请检查网络连接或视频源。</string>
+    <string name="ui_video_error_unspecified">未知错误，请稍后再试。</string>
+    <string name="ui_video_error_remote_error">远程错误，请稍后再试。</string>
+    <string name="ui_video_error_behind_live_window">实时窗口错误，请稍后再试。</string>
+    <string name="ui_video_error_timeout">超时错误，请稍后再试。</string>
+    <string name="ui_video_error_io_unspecified">IO错误，请稍后再试。</string>
+    <string name="ui_video_error_network_failed">网络连接异常或不支持IPv6，请检查网络设置。</string>
+    <string name="ui_video_error_network_timeout">网络连接超时，请检查网络设置。</string>
+    <string name="ui_video_error_invalid_http_content_type">HTTP请求返回错误类型，请检查视频源。</string>
+    <string name="ui_video_error_bad_http_status">HTTP请求返回错误状态，请检查视频源。</string>
+    <string name="ui_video_error_file_not_found">视频文件未找到，请检查视频源。</string>
+    <string name="ui_video_error_no_permission">没有权限访问视频文件，请检查权限设置。</string>
+    <string name="ui_video_error_cleartext_not_permitted">不允许使用明文访问视频文件，请检查权限设置。</string>
+    <string name="ui_video_error_read_position_out_of_range">视频文件读取位置超出范围，请检查视频源。</string>
+    <string name="ui_video_error_container_malformed">视频容器格式错误，请检查视频源。</string>
+    <string name="ui_video_error_manifest_malformed">视频流清单格式错误，请检查视频源。</string>
+    <string name="ui_video_error_container_unsupported">不支持的视频容器类型，请检查视频源。</string>
+    <string name="ui_video_error_manifest_unsupported">不支持的视频流清单类型，请检查视频源。</string>
+    <string name="ui_video_error_decoder_init_failed">视频解码器初始化失败，请检查视频源。</string>
+    <string name="ui_video_error_decoder_query_failed">视频解码器查询失败，请检查视频源。</string>
+    <string name="ui_video_error_decoding_failed">视频解码失败，请检查视频源。</string>
+    <string name="ui_video_error_decoding_format_exceeds_capabilities">视频解码格式超出能力范围，请更换设备。</string>
+    <string name="ui_video_error_decoding_unsupported">不支持的视频解码格式，请检查视频源。</string>
+    <string name="ui_video_error_decoding_resources_reclaimed">视频解码资源被回收，请检查视频源。</string>
+    <string name="ui_video_error_audio_track_init_failed">音频轨道初始化失败，请检查视频源。</string>
+    <string name="ui_video_error_audio_track_write_failed">音频轨道写入失败，请检查视频源。</string>
+    <string name="ui_video_error_audio_track_offload_write_failed">音频轨道离线写入失败，请检查视频源。</string>
+    <string name="ui_video_error_audio_track_offload_init_failed">音频轨道离线初始化失败，请检查视频源。</string>
+    <string name="ui_video_error_video_frame_processor_init_failed">视频帧处理器初始化失败，请检查视频源。</string>
+    <string name="ui_video_error_video_frame_processing_failed">视频帧处理失败，请检查视频源。</string>
+    <string name="ui_video_error_failed_runtime_check">运行时检查失败，请检查视频源。</string>
+    <string name="ui_video_error_drm_unspecified">DRM错误，请检查视频源。</string>
+    <string name="ui_video_error_drm_license_acquisition_failed">DRM授权失败，请检查视频源。</string>
+    <string name="ui_video_error_drm_disallowed_operation">DRM不允许的操作，请检查视频源。</string>
+    <string name="ui_video_error_drm_system_error">DRM系统错误，请检查视频源。</string>
+    <string name="ui_video_error_drm_device_revoked">DRM设备被吊销，请检查视频源。</string>
+    <string name="ui_video_error_drm_license_expired">DRM授权已过期，请检查视频源。</string>
+    <string name="ui_video_error_loading_timeout">加载超时</string>
+
+    <!-- 其他 -->
+    <string name="ui_iptv_source_cache_time">订阅源缓存时间</string>
+
+    <!-- 视频元数据相关 -->
+    <string name="ui_video_metadata_video">视频</string>
+    <string name="ui_video_metadata_audio">音频</string>
+    <string name="ui_video_metadata_subtitle_tracks">字幕轨道</string>
+    <string name="ui_video_metadata_resolution">分辨率</string>
+    <string name="ui_video_metadata_color_space">颜色空间</string>
+    <string name="ui_video_metadata_frame_rate">帧率</string>
+    <string name="ui_video_metadata_bitrate">码率</string>
+    <string name="ui_video_metadata_encoding">编码</string>
+    <string name="ui_video_metadata_decoder">解码器</string>
+    <string name="ui_video_metadata_channels">声道数</string>
+    <string name="ui_video_metadata_sample_rate">采样率</string>
+    <string name="ui_video_metadata_bit_rate">比特率</string>
+    <string name="ui_video_metadata_subtitle_count">字幕数</string>
+    <string name="ui_video_metadata_language">语言</string>
+
+    <!-- 节目相关 -->
+    <string name="ui_no_program">暂无节目</string>
     <string name="ui_update_auto_check">启动时自动检查更新</string>
     <string name="ui_update_auto_check_enabled">程序启动时会自动检查更新</string>
     <string name="ui_update_auto_check_disabled">程序启动时不检查更新</string>
@@ -384,4 +467,9 @@
     <string name="ui_audio_7_1_wide_back">后置 7.1 环绕声</string>
     <string name="ui_audio_hexagonal">六角环绕声</string>
     <string name="ui_audio_octagonal">八角环绕声</string>
+    <string name="ui_video_display_mode_original">原始</string>
+    <string name="ui_video_display_mode_fill">填充</string>
+    <string name="ui_video_display_mode_crop">裁剪</string>
+    <string name="ui_video_apply_to_global">应用到全局</string>
+    <string name="ui_video_applied_to_global">已应用到全局</string>
 </resources>

@@ -18,6 +18,7 @@ import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.R
 import androidx.compose.ui.res.stringResource
+import top.yogiczy.mytv.tv.ui.screensold.videoplayer.getLocalizedLabel
 
 @Composable
 fun SettingsVideoPlayerScreen(
@@ -126,7 +127,7 @@ fun SettingsVideoPlayerScreen(
         item {
             SettingsListItem(
                 headlineContent = stringResource(R.string.ui_player_view_display_mode),
-                trailingContent = settingsViewModel.videoPlayerDisplayMode.label,
+                trailingContent = { Text(settingsViewModel.videoPlayerDisplayMode.getLocalizedLabel()) },
                 onSelect = toVideoPlayerDisplayModeScreen,
                 link = true,
             )

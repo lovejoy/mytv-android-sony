@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
@@ -17,6 +18,7 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.distinctUntilChanged
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.VideoPlayerDisplayMode
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
@@ -63,7 +65,7 @@ fun VideoPlayerDisplayModeItemList(
                         .handleKeyEvents(onSelect = onApplyToGlobal),
                     selected = false,
                     onClick = {},
-                    headlineContent = { Text("应用到全局") },
+                    headlineContent = { Text(stringResource(R.string.ui_video_apply_to_global)) },
                 )
             }
         }

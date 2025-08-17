@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
@@ -22,6 +23,7 @@ fun AudioTrackItem(
     trackProvider: () -> VideoPlayer.Metadata.Audio = { VideoPlayer.Metadata.Audio() },
     onSelected: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val track = trackProvider()
 
     ListItem(
@@ -30,7 +32,7 @@ fun AudioTrackItem(
             .handleKeyEvents(onSelect = onSelected),
         selected = false,
         onClick = {},
-        headlineContent = { Text(track.shortLabel) },
+        headlineContent = { Text(track.getShortLabel(context)) },
         trailingContent = {
             RadioButton(selected = track.isSelected == true, onClick = {})
         },

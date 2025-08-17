@@ -1,5 +1,6 @@
 package top.yogiczy.mytv.tv.ui.screensold.videoplayer.player
 
+import android.content.Context
 import android.view.SurfaceView
 import android.view.TextureView
 import kotlinx.coroutines.CoroutineScope
@@ -7,10 +8,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import top.yogiczy.mytv.core.data.entities.channel.ChannelLine
-import top.yogiczy.mytv.core.util.utils.humanizeAudioChannels
 import top.yogiczy.mytv.core.util.utils.humanizeBitrate
-import top.yogiczy.mytv.core.util.utils.humanizeLanguage
 import top.yogiczy.mytv.tv.ui.utils.Configs
+import top.yogiczy.mytv.tv.ui.utils.humanizeAudioChannels
+import top.yogiczy.mytv.tv.ui.utils.humanizeLanguage
 import kotlin.math.roundToInt
 
 abstract class VideoPlayer(
@@ -222,13 +223,11 @@ abstract class VideoPlayer(
                 return result
             }
 
-            val shortLabel: String
-                get() = listOfNotNull(
-                    "${width.toString()}x${height.toString()}",
-                    frameRate?.takeIf { it > 0 }?.let { "${it.roundToInt()}fps" },
-                    bitrate?.takeIf { nnBitrate -> nnBitrate > 0 }?.humanizeBitrate()
-                )
-                    .joinToString(", ")
+            fun getShortLabel(): String = listOfNotNull(
+                "${width.toString()}x${height.toString()}",
+                frameRate?.takeIf { it > 0 }?.let { "${it.roundToInt()}fps" },
+                bitrate?.takeIf { nnBitrate -> nnBitrate > 0 }?.humanizeBitrate()
+            ).joinToString(", ")
         }
 
         data class Audio(
@@ -257,13 +256,11 @@ abstract class VideoPlayer(
                 return result
             }
 
-            val shortLabel: String
-                get() = listOfNotNull(
-                    channelsLabel ?: channels?.humanizeAudioChannels(),
-                    bitrate?.takeIf { nnBitrate -> nnBitrate > 0 }?.humanizeBitrate(),
-                    language?.humanizeLanguage(),
-                )
-                    .joinToString(", ")
+            fun getShortLabel(context: Context): String = listOfNotNull(
+                channelsLabel ?: channels?.humanizeAudioChannels(context),
+                bitrate?.takeIf { nnBitrate -> nnBitrate > 0 }?.humanizeBitrate(),
+                language?.humanizeLanguage(context),
+            ).joinToString(", ")
         }
 
         data class Subtitle(
@@ -286,11 +283,9 @@ abstract class VideoPlayer(
                 return result
             }
 
-            val shortLabel: String
-                get() = listOfNotNull(
-                    language?.humanizeLanguage(),
-                )
-                    .joinToString(", ")
+            fun getShortLabel(context: Context): String = listOfNotNull(
+                language?.humanizeLanguage(context),
+            ).joinToString(", ")
         }
     }
 }

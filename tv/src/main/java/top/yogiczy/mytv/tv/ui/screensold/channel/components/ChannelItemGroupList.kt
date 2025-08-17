@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.LocalContentColor
@@ -24,6 +25,7 @@ import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.channelGroupIdx
 import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.channelList
 import top.yogiczy.mytv.core.data.entities.epg.EpgList
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
@@ -70,7 +72,7 @@ fun ChannelItemGroupList(
             ) {
                 Text(channelGroup.name, style = MaterialTheme.typography.labelMedium)
                 Text(
-                    "${channelGroup.channelList.size}个频道",
+                    "${channelGroup.channelList.size}${stringResource(R.string.ui_channel_count_suffix)}",
                     style = MaterialTheme.typography.labelMedium,
                     color = LocalContentColor.current.copy(0.8f),
                 )

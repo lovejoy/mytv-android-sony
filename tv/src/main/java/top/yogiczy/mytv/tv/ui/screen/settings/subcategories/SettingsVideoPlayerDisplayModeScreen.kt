@@ -21,6 +21,7 @@ import androidx.tv.material3.Text
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.screen.components.AppScreen
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.VideoPlayerDisplayMode
+import top.yogiczy.mytv.tv.ui.screensold.videoplayer.getLocalizedLabel
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 import top.yogiczy.mytv.tv.R
@@ -55,7 +56,7 @@ fun SettingsVideoPlayerDisplayModeScreen(
                         .handleKeyEvents(onSelect = { onDisplayModeChanged(mode) }),
                     headlineContent = {
                         Text(
-                            mode.label,
+                            mode.getLocalizedLabel(),
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
                         )

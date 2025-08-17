@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.LocalContentColor
@@ -28,6 +30,7 @@ import top.yogiczy.mytv.core.data.entities.channel.Channel
 import top.yogiczy.mytv.core.data.entities.channel.ChannelList
 import top.yogiczy.mytv.core.data.entities.epg.EpgList
 import top.yogiczy.mytv.core.data.entities.epg.EpgList.Companion.recentProgramme
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
@@ -75,7 +78,7 @@ fun ChannelItemGrid(
         ) {
             Text(text = title, style = MaterialTheme.typography.labelMedium)
             Text(
-                text = "${channelList.size}个频道",
+                text = "${channelList.size}${stringResource(R.string.ui_channel_count_suffix)}",
                 style = MaterialTheme.typography.labelMedium,
                 color = LocalContentColor.current.copy(alpha = 0.8f),
             )

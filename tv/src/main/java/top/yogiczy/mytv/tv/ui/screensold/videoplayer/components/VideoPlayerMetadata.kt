@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.LocalContentColor
@@ -14,6 +15,7 @@ import androidx.tv.material3.LocalTextStyle
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import top.yogiczy.mytv.core.util.utils.humanizeBitrate
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 
@@ -39,37 +41,37 @@ fun VideoPlayerMetadata(
         ) {
             metadata.video?.let { nnVideo ->
                 Column {
-                    Text("视频", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.ui_video_metadata_video), style = MaterialTheme.typography.titleMedium)
                     Column(modifier = Modifier.padding(start = 10.dp)) {
-                        nnVideo.width?.let { nnWidth -> Text("分辨率: ${nnWidth}x${nnVideo.height}") }
-                        nnVideo.color?.let { nnColor -> Text("颜色空间: $nnColor") }
-                        nnVideo.frameRate?.let { nnFrameRate -> Text("帧率: $nnFrameRate") }
-                        nnVideo.bitrate?.let { nnBitrate -> Text("码率: ${nnBitrate.humanizeBitrate()}") }
-                        nnVideo.mimeType?.let { nnMimeType -> Text("编码: $nnMimeType") }
-                        nnVideo.decoder?.let { nnDecoder -> Text("解码器: $nnDecoder") }
+                        nnVideo.width?.let { nnWidth -> Text("${stringResource(R.string.ui_video_metadata_resolution)}: ${nnWidth}x${nnVideo.height}") }
+                        nnVideo.color?.let { nnColor -> Text("${stringResource(R.string.ui_video_metadata_color_space)}: $nnColor") }
+                        nnVideo.frameRate?.let { nnFrameRate -> Text("${stringResource(R.string.ui_video_metadata_frame_rate)}: $nnFrameRate") }
+                        nnVideo.bitrate?.let { nnBitrate -> Text("${stringResource(R.string.ui_video_metadata_bitrate)}: ${nnBitrate.humanizeBitrate()}") }
+                        nnVideo.mimeType?.let { nnMimeType -> Text("${stringResource(R.string.ui_video_metadata_encoding)}: $nnMimeType") }
+                        nnVideo.decoder?.let { nnDecoder -> Text("${stringResource(R.string.ui_video_metadata_decoder)}: $nnDecoder") }
                     }
                 }
             }
 
             metadata.audio?.let { nnAudio ->
                 Column {
-                    Text("音频", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.ui_video_metadata_audio), style = MaterialTheme.typography.titleMedium)
                     Column(modifier = Modifier.padding(start = 10.dp)) {
-                        nnAudio.channels?.let { nnChannels -> Text("声道数: $nnChannels") }
-                        nnAudio.sampleRate?.let { nnSampleRate -> Text("采样率: $nnSampleRate Hz") }
-                        nnAudio.bitrate?.let { nnBitrate -> Text("比特率: ${nnBitrate.humanizeBitrate()}") }
-                        nnAudio.mimeType?.let { nnMimeType -> Text("编码: $nnMimeType") }
-                        nnAudio.decoder?.let { nnDecoder -> Text("解码器: $nnDecoder") }
+                        nnAudio.channels?.let { nnChannels -> Text("${stringResource(R.string.ui_video_metadata_channels)}: $nnChannels") }
+                        nnAudio.sampleRate?.let { nnSampleRate -> Text("${stringResource(R.string.ui_video_metadata_sample_rate)}: $nnSampleRate Hz") }
+                        nnAudio.bitrate?.let { nnBitrate -> Text("${stringResource(R.string.ui_video_metadata_bit_rate)}: ${nnBitrate.humanizeBitrate()}") }
+                        nnAudio.mimeType?.let { nnMimeType -> Text("${stringResource(R.string.ui_video_metadata_encoding)}: $nnMimeType") }
+                        nnAudio.decoder?.let { nnDecoder -> Text("${stringResource(R.string.ui_video_metadata_decoder)}: $nnDecoder") }
                     }
                 }
             }
             metadata.subtitleTracks?.let { nnSubtitleTracks ->
                 Column {
-                    Text("字幕轨道", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.ui_video_metadata_subtitle_tracks), style = MaterialTheme.typography.titleMedium)
                     Column(modifier = Modifier.padding(start = 10.dp)) {
-                        Text("字幕数: ${nnSubtitleTracks.size}")
+                        Text("${stringResource(R.string.ui_video_metadata_subtitle_count)}: ${nnSubtitleTracks.size}")
                         nnSubtitleTracks.forEach { nnSubtitle ->
-                            nnSubtitle.language?.let { language -> Text("语言: $language") }
+                            nnSubtitle.language?.let { language -> Text("${stringResource(R.string.ui_video_metadata_language)}: $language") }
                         }
                     }
                 }

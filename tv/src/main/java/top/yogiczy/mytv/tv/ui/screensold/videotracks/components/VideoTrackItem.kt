@@ -30,7 +30,7 @@ fun VideoTrackItem(
             .handleKeyEvents(onSelect = onSelected),
         selected = false,
         onClick = {},
-        headlineContent = { Text(track.shortLabel) },
+        headlineContent = { Text(track.getShortLabel()) },
         trailingContent = {
             RadioButton(selected = track.isSelected == true, onClick = {})
         },

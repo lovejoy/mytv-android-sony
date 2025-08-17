@@ -9,12 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.RadioButton
 import androidx.tv.material3.Text
 import kotlinx.coroutines.flow.distinctUntilChanged
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.focusOnLaunchedSaveable
@@ -29,9 +32,10 @@ fun SubtitleTrackItemList(
     onSelected: (VideoPlayer.Metadata.Subtitle?) -> Unit = {},
     onUserAction: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val trackList = trackListProvider()
     // 过滤掉shortLabel为空字符串的字幕轨道
-    val filteredTrackList = trackList.filter { it.shortLabel.isNotBlank() }
+    val filteredTrackList = trackList.filter { it.getShortLabel(context).isNotBlank() }
 
     val listState =
         rememberLazyListState(max(0, filteredTrackList.indexOfFirst { it.isSelected == true } - 2))
@@ -58,7 +62,7 @@ fun SubtitleTrackItemList(
                     .handleKeyEvents(onSelect = { onSelected(null) }),
                 selected = false,
                 onClick = {},
-                headlineContent = { Text("关闭") },
+                headlineContent = { Text(stringResource(R.string.ui_close)) },
                 trailingContent = {
                     RadioButton(selected = filteredTrackList.all { it.isSelected != true }, onClick = {})
                 },

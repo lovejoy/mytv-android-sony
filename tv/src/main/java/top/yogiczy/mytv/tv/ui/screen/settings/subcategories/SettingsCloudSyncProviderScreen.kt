@@ -86,15 +86,15 @@ private fun SettingsCloudSyncProviderSupportState(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (provider.supportPull) {
-            Text("支持拉取")
+            Text(stringResource(R.string.ui_cloud_sync_pull_supported))
         } else {
-            Text("不支持拉取", color = MaterialTheme.colorScheme.error)
+            Text(stringResource(R.string.ui_cloud_sync_pull_not_supported), color = MaterialTheme.colorScheme.error)
         }
 
         if (provider.supportPush) {
-            Text("支持推送")
+            Text(stringResource(R.string.ui_cloud_sync_push_supported))
         } else {
-            Text("不支持推送", color = MaterialTheme.colorScheme.error)
+            Text(stringResource(R.string.ui_cloud_sync_push_not_supported), color = MaterialTheme.colorScheme.error)
         }
     }
 }

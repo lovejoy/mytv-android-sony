@@ -224,3 +224,15 @@ enum class VideoPlayerDisplayMode(val value: Int, val label: String) {
         }
     }
 }
+
+@Composable
+fun VideoPlayerDisplayMode.getLocalizedLabel(): String {
+    return when (this) {
+        VideoPlayerDisplayMode.ORIGINAL -> androidx.compose.ui.res.stringResource(top.yogiczy.mytv.tv.R.string.ui_video_display_mode_original)
+        VideoPlayerDisplayMode.FILL -> androidx.compose.ui.res.stringResource(top.yogiczy.mytv.tv.R.string.ui_video_display_mode_fill)
+        VideoPlayerDisplayMode.CROP -> androidx.compose.ui.res.stringResource(top.yogiczy.mytv.tv.R.string.ui_video_display_mode_crop)
+        VideoPlayerDisplayMode.FOUR_THREE -> "4:3"
+        VideoPlayerDisplayMode.SIXTEEN_NINE -> "16:9"
+        VideoPlayerDisplayMode.WIDE -> "2.35:1"
+    }
+}

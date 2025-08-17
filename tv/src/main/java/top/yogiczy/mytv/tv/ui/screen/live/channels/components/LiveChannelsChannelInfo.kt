@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +42,6 @@ import top.yogiczy.mytv.core.data.entities.epg.EpgProgramme.Companion.progress
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgramme.Companion.remainingMinutes
 import top.yogiczy.mytv.core.data.entities.epg.EpgProgrammeRecent
 import top.yogiczy.mytv.core.data.utils.ChannelUtil
-import top.yogiczy.mytv.core.util.utils.humanizeAudioChannels
 import top.yogiczy.mytv.core.util.utils.isIPv6
 import top.yogiczy.mytv.tv.ui.material.ProgressBar
 import top.yogiczy.mytv.tv.ui.material.ProgressBarColors
@@ -49,6 +49,7 @@ import top.yogiczy.mytv.tv.ui.material.Tag
 import top.yogiczy.mytv.tv.ui.material.TagDefaults
 import top.yogiczy.mytv.tv.ui.screen.channels.components.ChannelsChannelItemLogo
 import top.yogiczy.mytv.tv.ui.screen.settings.settingsVM
+import top.yogiczy.mytv.tv.ui.utils.humanizeAudioChannels
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.gridColumns
@@ -71,6 +72,7 @@ fun LiveChannelsChannelInfo(
     dense: Boolean = false,
     showChannelLogo: Boolean = settingsVM.uiShowChannelLogo,
 ) {
+    val context = LocalContext.current
     val currentPlaybackEpgProgramme = currentPlaybackEpgProgrammeProvider()
 
     Row(
@@ -150,6 +152,7 @@ private fun LiveChannelsChannelInfoTags(
     currentPlaybackEpgProgrammeProvider: () -> EpgProgramme? = { null },
     playerMetadataProvider: () -> VideoPlayer.Metadata = { VideoPlayer.Metadata() },
 ) {
+    val context = LocalContext.current
     val channel = channelProvider()
     val channelLineIdx = channelLineIdxProvider()
     val line = channel.lineList[channelLineIdx]
@@ -213,7 +216,7 @@ private fun LiveChannelsChannelInfoTags(
         playerMetadata.audio?.let { nnAudio ->
             nnAudio.channels?.takeIf { it > 0 }?.let { nnChannels ->
                 Tag(
-                    nnAudio.channelsLabel ?: nnChannels.humanizeAudioChannels(),
+                    nnAudio.channelsLabel ?: nnChannels.humanizeAudioChannels(context),
                     colors = tagColors,
                 )
             }

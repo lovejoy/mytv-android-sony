@@ -48,7 +48,7 @@ data class EpgProgramme(
         val EXAMPLE = EpgProgramme(
             startAt = System.currentTimeMillis() - 3600 * 1000,
             endAt = System.currentTimeMillis() + 3600 * 1000,
-            title = "节目标题",
+            title = "Program Title",
         )
 
         val EMPTY by lazy {
@@ -61,7 +61,7 @@ data class EpgProgramme(
             EpgProgramme(
                 startAt = calendar.timeInMillis,
                 endAt = calendar.timeInMillis + (24 * 3600 - 1) * 1000,
-                title = "精彩节目",
+                title = "Featured Program",
             )
         }
     }

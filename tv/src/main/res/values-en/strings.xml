@@ -72,6 +72,7 @@
     <string name="ui_crash_handler_tip">Tip: You can click the "Copy Log" button above to copy the full crash information for reporting issues.</string>
     <string name="ui_return">Return</string>
     <string name="ui_excellent_program">Featured Program</string>
+    <string name="ui_program_title">Program Title</string>
     <string name="ui_minutes">Minutes</string>
     <string name="ui_favorites_empty">No favorite channels</string>
     <string name="ui_channel_empty">Channel list not loaded yet</string>
@@ -359,7 +360,89 @@
     <string name="ui_language_setting_support">Choose app display language</string>
     <string name="ui_language_follow_system">Follow System</string>
     <string name="ui_language_chinese">中文</string>
+    <string name="ui_language_simplified_chinese">Simplified Chinese</string>
     <string name="ui_language_english">English</string>
+    <string name="ui_audio_dolby_atmos_7_1_2">7.1.2 Dolby Atmos</string>
+    <string name="ui_audio_dolby_atmos_7_1_4">7.1.4 Dolby Atmos</string>
+    <string name="ui_audio_channels_format">%d Channels</string>
+
+    <!-- 云同步相关 -->
+    <string name="ui_cloud_sync_pull_supported">Pull Supported</string>
+    <string name="ui_cloud_sync_push_supported">Push Supported</string>
+    <string name="ui_cloud_sync_pull_not_supported">Pull Not Supported</string>
+    <string name="ui_cloud_sync_push_not_supported">Push Not Supported</string>
+
+    <!-- 频道相关 -->
+    <string name="ui_channel_subscription_source">Sources</string>
+    <string name="ui_channel_count_suffix"> Channels</string>
+
+    <!-- 崩溃处理相关 -->
+    <string name="ui_crash_device_id">Device ID</string>
+    <string name="ui_crash_time">Crash Time</string>
+
+    <!-- 视频播放器错误 -->
+    <string name="ui_video_playback_failed">Playback Failed</string>
+    <string name="ui_video_error_unsupported_type">Unsupported video type, please check video source.</string>
+    <string name="ui_video_error_load_timeout">Loading timeout, please check network connection or video source.</string>
+    <string name="ui_video_error_unspecified">Unknown error, please try again later.</string>
+    <string name="ui_video_error_remote_error">Remote error, please try again later.</string>
+    <string name="ui_video_error_behind_live_window">Live window error, please try again later.</string>
+    <string name="ui_video_error_timeout">Timeout error, please try again later.</string>
+    <string name="ui_video_error_io_unspecified">IO error, please try again later.</string>
+    <string name="ui_video_error_network_failed">Network connection failed or IPv6 not supported, please check network settings.</string>
+    <string name="ui_video_error_network_timeout">Network connection timeout, please check network settings.</string>
+    <string name="ui_video_error_invalid_http_content_type">HTTP request returned invalid content type, please check video source.</string>
+    <string name="ui_video_error_bad_http_status">HTTP request returned error status, please check video source.</string>
+    <string name="ui_video_error_file_not_found">Video file not found, please check video source.</string>
+    <string name="ui_video_error_no_permission">No permission to access video file, please check permission settings.</string>
+    <string name="ui_video_error_cleartext_not_permitted">Cleartext access to video file not permitted, please check permission settings.</string>
+    <string name="ui_video_error_read_position_out_of_range">Video file read position out of range, please check video source.</string>
+    <string name="ui_video_error_container_malformed">Video container format error, please check video source.</string>
+    <string name="ui_video_error_manifest_malformed">Video manifest format error, please check video source.</string>
+    <string name="ui_video_error_container_unsupported">Unsupported video container type, please check video source.</string>
+    <string name="ui_video_error_manifest_unsupported">Unsupported video manifest type, please check video source.</string>
+    <string name="ui_video_error_decoder_init_failed">Video decoder initialization failed, please check video source.</string>
+    <string name="ui_video_error_decoder_query_failed">Video decoder query failed, please check video source.</string>
+    <string name="ui_video_error_decoding_failed">Video decoding failed, please check video source.</string>
+    <string name="ui_video_error_decoding_format_exceeds_capabilities">Video decoding format exceeds capabilities, please change device.</string>
+    <string name="ui_video_error_decoding_unsupported">Unsupported video decoding format, please check video source.</string>
+    <string name="ui_video_error_decoding_resources_reclaimed">Video decoding resources reclaimed, please check video source.</string>
+    <string name="ui_video_error_audio_track_init_failed">Audio track initialization failed, please check video source.</string>
+    <string name="ui_video_error_audio_track_write_failed">Audio track write failed, please check video source.</string>
+    <string name="ui_video_error_audio_track_offload_write_failed">Audio track offload write failed, please check video source.</string>
+    <string name="ui_video_error_audio_track_offload_init_failed">Audio track offload initialization failed, please check video source.</string>
+    <string name="ui_video_error_video_frame_processor_init_failed">Video frame processor initialization failed, please check video source.</string>
+    <string name="ui_video_error_video_frame_processing_failed">Video frame processing failed, please check video source.</string>
+    <string name="ui_video_error_failed_runtime_check">Runtime check failed, please check video source.</string>
+    <string name="ui_video_error_drm_unspecified">DRM error, please check video source.</string>
+    <string name="ui_video_error_drm_license_acquisition_failed">DRM license acquisition failed, please check video source.</string>
+    <string name="ui_video_error_drm_disallowed_operation">DRM disallowed operation, please check video source.</string>
+    <string name="ui_video_error_drm_system_error">DRM system error, please check video source.</string>
+    <string name="ui_video_error_drm_device_revoked">DRM device revoked, please check video source.</string>
+    <string name="ui_video_error_drm_license_expired">DRM license expired, please check video source.</string>
+    <string name="ui_video_error_loading_timeout">Loading Timeout</string>
+
+    <!-- 其他 -->
+    <string name="ui_iptv_source_cache_time">IPTV Source Cache Time</string>
+
+    <!-- 视频元数据相关 -->
+    <string name="ui_video_metadata_video">Video</string>
+    <string name="ui_video_metadata_audio">Audio</string>
+    <string name="ui_video_metadata_subtitle_tracks">Subtitle Tracks</string>
+    <string name="ui_video_metadata_resolution">Resolution</string>
+    <string name="ui_video_metadata_color_space">Color Space</string>
+    <string name="ui_video_metadata_frame_rate">Frame Rate</string>
+    <string name="ui_video_metadata_bitrate">Bitrate</string>
+    <string name="ui_video_metadata_encoding">Encoding</string>
+    <string name="ui_video_metadata_decoder">Decoder</string>
+    <string name="ui_video_metadata_channels">Channels</string>
+    <string name="ui_video_metadata_sample_rate">Sample Rate</string>
+    <string name="ui_video_metadata_bit_rate">Bit Rate</string>
+    <string name="ui_video_metadata_subtitle_count">Subtitle Count</string>
+    <string name="ui_video_metadata_language">Language</string>
+
+    <!-- 节目相关 -->
+    <string name="ui_no_program">No Program</string>
     <string name="ui_update_auto_check">Auto Check Updates on Startup</string>
     <string name="ui_update_auto_check_enabled">App will automatically check for updates on startup</string>
     <string name="ui_update_auto_check_disabled">App will not check for updates on startup</string>
@@ -384,5 +467,10 @@
     <string name="ui_audio_7_1_wide_back">7.1 Wide Back Surround</string>
     <string name="ui_audio_hexagonal">Hexagonal Surround</string>
     <string name="ui_audio_octagonal">Octagonal Surround</string>
+    <string name="ui_video_display_mode_original">Original</string>
+    <string name="ui_video_display_mode_fill">Fill</string>
+    <string name="ui_video_display_mode_crop">Crop</string>
+    <string name="ui_video_apply_to_global">Apply to Global</string>
+    <string name="ui_video_applied_to_global">Applied to Global</string>
 
 </resources>

@@ -9,12 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ListItem
 import androidx.tv.material3.RadioButton
 import androidx.tv.material3.Text
 import kotlinx.coroutines.flow.distinctUntilChanged
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.screensold.videoplayer.player.VideoPlayer
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.focusOnLaunchedSaveable
@@ -56,7 +58,7 @@ fun AudioTrackItemList(
                     .handleKeyEvents(onSelect = { onSelected(null) }),
                 selected = false,
                 onClick = {},
-                headlineContent = { Text("关闭") },
+                headlineContent = { Text(stringResource(R.string.ui_close)) },
                 trailingContent = {
                     RadioButton(selected = trackList.all { it.isSelected != true }, onClick = {})
                 },
