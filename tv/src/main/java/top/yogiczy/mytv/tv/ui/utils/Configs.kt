@@ -487,7 +487,7 @@ object Configs {
 
     /** 换台跨分组切换 **/
     var iptvChannelChangeCrossGroup: Boolean
-        get() = SP.getBoolean(KEY.IPTV_CHANNEL_CHANGE_CROSS_GROUP.name, true)
+        get() = SP.getBoolean(KEY.IPTV_CHANNEL_CHANGE_CROSS_GROUP.name, false)
         set(value) = SP.putBoolean(KEY.IPTV_CHANNEL_CHANGE_CROSS_GROUP.name, value)
 
     /** ==================== 节目单 ==================== */
@@ -678,7 +678,7 @@ object Configs {
 
     /** 启动时自动检查更新 */
     var updateAutoCheck: Boolean
-        get() = SP.getBoolean(KEY.UPDATE_AUTO_CHECK.name, true)
+        get() = SP.getBoolean(KEY.UPDATE_AUTO_CHECK.name, false)
         set(value) = SP.putBoolean(KEY.UPDATE_AUTO_CHECK.name, value)
 
     /** 更新通道 */
