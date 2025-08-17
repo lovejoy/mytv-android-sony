@@ -99,8 +99,9 @@ fun AboutScreen(
                     visibleProvider = { visible },
                     onDismissRequest = { visible = false },
                     text = Constants.APP_REPO,
-                    description = "扫码前往代码仓库",
-                )
+                    description = "本项目是派生项目，不建议在原始项目反馈问题，扫码以前往本项目",
+
+                    )
             }
 
             item {
@@ -108,7 +109,7 @@ fun AboutScreen(
 
                 ListItem(
                     modifier = Modifier.handleKeyEvents(onSelect = { visible = true }),
-                    headlineContent = { Text("讨论交流 Telegram") },
+                    headlineContent = { Text("原始项目讨论交流 Telegram") },
                     trailingContent = {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -173,6 +174,36 @@ fun AboutScreen(
                     visibleProvider = { visible },
                     onDismissRequest = { visible = false },
                     text = Globals.deviceId,
+                )
+            }
+            item {
+                var visible by remember { mutableStateOf(false) }
+                ListItem(
+                    modifier = Modifier.handleKeyEvents(onSelect = { visible = true }),
+                    headlineContent = { Text("mytv-android仓库") },
+                    trailingContent = {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(Constants.MYTV_REPO)
+
+                            Icon(
+                                Icons.AutoMirrored.Default.OpenInNew,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    },
+                    selected = false,
+                    onClick = {},
+                )
+
+                QrcodePopup(
+                    visibleProvider = { visible },
+                    onDismissRequest = { visible = false },
+                    text = Constants.MYTV_REPO,
+                    description = "本项目的诞生离不开mytv-android项目，扫码以前往",
                 )
             }
             item {
