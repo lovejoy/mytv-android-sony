@@ -264,8 +264,6 @@ fun MainScreen(
                             checkUpdate()
                         }
                     },
-                    toSettingsScreen = { navController.navigateSingleTop(Screens.Settings()) },
-                    onBackPressed = onBackPressed,
                 )
             }
 
