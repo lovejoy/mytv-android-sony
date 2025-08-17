@@ -54,7 +54,7 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "SENTRY_DSN", "\"${getProperty("sentry.dsn") ?: System.getenv("SENTRY_DSN")}\"")
+        buildConfigField("String", "SENTRY_DSN", "\"${getProperty("sentry.dsn") ?: System.getenv("SENTRY_DSN") ?: ""}\"")
     }
 
     buildTypes {
@@ -73,7 +73,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            signingConfig = signingConfigs.getByName("release")
+            // 使用默认的debug签名配置
         }
     }
     splits {
