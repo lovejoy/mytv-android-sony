@@ -129,14 +129,14 @@ class MainActivity : ComponentActivity() {
             KeyEvent.KEYCODE_MEDIA_NEXT -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     Log.d(TAG, "Media Next key (Channel Down) intercepted")
-                    handleChannelDown()
+                    handleChannelUp()
                 }
                 return true
             }
             KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
                     Log.d(TAG, "Media Previous key (Channel Up) intercepted")
-                    handleChannelUp()
+                    handleChannelDown()
                 }
                 return true
             }

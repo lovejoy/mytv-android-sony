@@ -36,6 +36,7 @@ import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 import top.yogiczy.mytv.tv.ui.utils.ifElse
 import top.yogiczy.mytv.tv.ui.utils.saveFocusRestorer
+import top.yogiczy.mytv.tv.ui.utils.focusOnLaunchedSaveable
 import top.yogiczy.mytv.core.data.entities.actions.KeyDownAction
 import top.yogiczy.mytv.tv.ui.material.SimplePopup
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
@@ -312,11 +313,13 @@ fun SettingsUiControlSettingSubMenu(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             items(valueList) { value ->
+                val isCurrentValue = currentValue == value
+                
                 ListItem(
                     modifier = Modifier
                         .ifElse(
-                            currentValue == value,
-                            Modifier.focusRequester(firstItemFocusRequester)
+                            isCurrentValue,
+                            Modifier.focusRequester(firstItemFocusRequester).focusOnLaunchedSaveable()
                         )
                         .handleKeyEvents(onSelect = { onValueChanged(value) }),
                         
@@ -328,7 +331,7 @@ fun SettingsUiControlSettingSubMenu(
                         )
                     },
                     trailingContent = {
-                        if (currentValue == value) {
+                        if (isCurrentValue) {
                             Icon(
                                 Icons.Default.CheckCircle,
                                 contentDescription = null,
@@ -339,7 +342,7 @@ fun SettingsUiControlSettingSubMenu(
                         containerColor = MaterialTheme.colorScheme.onSurface.copy(0.1f),
                     ),
                     selected = false,
-                    onClick = {},
+                    onClick = { onValueChanged(value) },
                 )
             }
         }

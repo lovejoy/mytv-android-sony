@@ -748,7 +748,7 @@ class SettingsViewModel : ViewModel() {
             Configs.cloudSyncWebDavPassword = value
         }
 
-    private var _keyDownEventUp by mutableStateOf(KeyDownAction.ChangeCurrentChannelToPrev)
+    private var _keyDownEventUp by mutableStateOf(KeyDownAction.ChangeCurrentChannelToNext)
     var keyDownEventUp: KeyDownAction
         get() = _keyDownEventUp
         set(value) {
@@ -756,7 +756,7 @@ class SettingsViewModel : ViewModel() {
             Configs.keyDownEventUp = value
         }
 
-    private var _keyDownEventDown by mutableStateOf(KeyDownAction.ChangeCurrentChannelToNext)
+    private var _keyDownEventDown by mutableStateOf(KeyDownAction.ChangeCurrentChannelToPrev)
     var keyDownEventDown: KeyDownAction
         get() = _keyDownEventDown
         set(value) {

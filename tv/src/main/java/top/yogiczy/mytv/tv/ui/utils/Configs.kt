@@ -614,12 +614,12 @@ object Configs {
     /** ==================== 按键行为控制 ==================== */
     /** 按键行为上键 */
     var keyDownEventUp: KeyDownAction
-        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_UP.name, KeyDownAction.ChangeCurrentChannelToPrev.value))
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_UP.name, KeyDownAction.ChangeCurrentChannelToNext.value))
         set(value) = SP.putInt(KEY.KEYDOWN_EVENT_UP.name, value.value)
 
     /** 按键行为下键 */
     var keyDownEventDown: KeyDownAction
-        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_DOWN.name, KeyDownAction.ChangeCurrentChannelToNext.value))
+        get() = KeyDownAction.fromValue(SP.getInt(KEY.KEYDOWN_EVENT_DOWN.name, KeyDownAction.ChangeCurrentChannelToPrev.value))
         set(value) = SP.putInt(KEY.KEYDOWN_EVENT_DOWN.name, value.value)
 
     /** 按键行为左键 */
