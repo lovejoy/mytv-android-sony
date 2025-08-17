@@ -201,14 +201,6 @@ class MainActivity : ComponentActivity() {
                 }
                 return true // 拦截事件，不传递给系统
             }
-            // 音轨按键
-            KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK -> {
-                if (event.action == KeyEvent.ACTION_DOWN) {
-                    Log.d(TAG, "Media Audio Track key intercepted")
-                    handleAudioTrackKey()
-                }
-                return true // 拦截事件，不传递给系统
-            }
             // F2键 - Dashboard主页
             KeyEvent.KEYCODE_F2 -> {
                 if (event.action == KeyEvent.ACTION_DOWN) {
@@ -237,11 +229,6 @@ class MainActivity : ComponentActivity() {
             KeyEvent.KEYCODE_LAST_CHANNEL -> {
                 Log.d(TAG, "Last Channel key intercepted in onKeyDown")
                 handleLastChannelKey()
-                return true
-            }
-            KeyEvent.KEYCODE_MEDIA_AUDIO_TRACK -> {
-                Log.d(TAG, "Media Audio Track key intercepted in onKeyDown")
-                handleAudioTrackKey()
                 return true
             }
             KeyEvent.KEYCODE_F2 -> {
