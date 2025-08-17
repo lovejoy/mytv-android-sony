@@ -170,6 +170,9 @@ fun MainContent(
                 onAudioTrack = {
                     mainContentState.isAudioTracksScreenVisible = !mainContentState.isAudioTracksScreenVisible
                 },
+                onSubtitle = {
+                    mainContentState.isSubtitleTracksScreenVisible = !mainContentState.isSubtitleTracksScreenVisible
+                },
             )
             .handleDragGestures(
                 onSwipeDown = {

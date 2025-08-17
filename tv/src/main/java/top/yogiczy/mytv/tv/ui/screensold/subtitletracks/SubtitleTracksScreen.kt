@@ -14,6 +14,7 @@ import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.tooling.PreviewWithLayoutGrids
 import top.yogiczy.mytv.tv.ui.utils.backHandler
 import top.yogiczy.mytv.tv.ui.utils.gridColumns
+import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
 
 @Composable
 fun SubtitleTracksScreen(
@@ -25,7 +26,9 @@ fun SubtitleTracksScreen(
     val screenAutoCloseState = rememberScreenAutoCloseState(onTimeout = onClose)
 
     Drawer(
-        modifier = modifier.backHandler { onClose() },
+        modifier = modifier
+            .backHandler { onClose() }
+            .handleKeyEvents(onSubtitle = { onClose() }),
         onDismissRequest = onClose,
         position = DrawerPosition.End,
         header = { Text("字幕") },
