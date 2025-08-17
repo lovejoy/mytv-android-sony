@@ -20,12 +20,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.material.LazyRow
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.screen.components.AppScreen
 import top.yogiczy.mytv.tv.ui.theme.MyTvTheme
 import top.yogiczy.mytv.tv.ui.utils.handleKeyEvents
-import top.yogiczy.mytv.tv.R
 
 @Composable
 fun DashboardModuleList(
@@ -69,7 +69,7 @@ fun DashboardModuleList(
         item {
             DashboardModuleItem(
                 imageVector = Icons.Outlined.Schedule,
-                title = "节目指南",
+                title = stringResource(R.string.ui_epg_guide),
                 onSelected = toEpgGuideScreen,
             )
         }

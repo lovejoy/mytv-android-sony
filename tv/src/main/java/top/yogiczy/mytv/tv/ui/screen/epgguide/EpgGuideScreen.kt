@@ -15,9 +15,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import java.util.Calendar
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.core.data.entities.channel.Channel
 import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList
 import top.yogiczy.mytv.core.data.entities.channel.ChannelGroupList.Companion.channelList
@@ -52,7 +54,7 @@ fun EpgGuideScreen(
 
     AppScreen(
         modifier = modifier,
-        header = { Text("节目指南") },
+        header = { Text(stringResource(R.string.ui_epg_guide)) },
         canBack = true,
         enableTopBarHidden = true,
         onBackPressed = onBackPressed,

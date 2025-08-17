@@ -33,6 +33,7 @@ fun SettingsAppScreen(
     modifier: Modifier = Modifier,
     settingsViewModel: SettingsViewModel = settingsVM,
     onReload: () -> Unit = {},
+    onLanguageSettingScreen: () -> Unit = {},
     onBackPressed: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -80,6 +81,22 @@ fun SettingsAppScreen(
                 onSelect = {
                     settingsViewModel.appPipEnable = !settingsViewModel.appPipEnable
                 },
+            )
+        }
+
+        item {
+            val languageDisplayName = when (settingsViewModel.appLanguage) {
+                "" -> stringResource(R.string.ui_language_follow_system)
+                "zh" -> stringResource(R.string.ui_language_chinese)
+                "en" -> stringResource(R.string.ui_language_english)
+                else -> stringResource(R.string.ui_language_follow_system)
+            }
+            
+            SettingsListItem(
+                headlineContent = stringResource(R.string.ui_language_setting),
+                supportingContent = stringResource(R.string.ui_language_setting_support),
+                trailingContent = languageDisplayName,
+                onSelect = onLanguageSettingScreen,
             )
         }
 

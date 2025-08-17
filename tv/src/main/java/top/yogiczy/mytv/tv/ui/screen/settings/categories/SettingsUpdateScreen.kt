@@ -47,9 +47,9 @@ fun SettingsUpdateScreen(
             val autoCheck = settingsViewModel.updateAutoCheck
 
             SettingsListItem(
-                headlineContent = "启动时自动检查更新",
-                supportingContent = if (autoCheck) "程序启动时会自动检查更新"
-                else "程序启动时不检查更新",
+                headlineContent = stringResource(R.string.ui_update_auto_check),
+                supportingContent = if (autoCheck) stringResource(R.string.ui_update_auto_check_enabled)
+                else stringResource(R.string.ui_update_auto_check_disabled),
                 trailingContent = {
                     Switch(autoCheck, null)
                 },

@@ -274,34 +274,34 @@ class IjkVideoPlayer(
                     else -> 0
                 },
                 channelsLabel = when (info.mMeta.mAudioStream?.mChannelLayout) {
-                    IjkMediaMeta.AV_CH_LAYOUT_MONO -> "单声道"
-                    IjkMediaMeta.AV_CH_LAYOUT_STEREO -> "立体声"
-                    IjkMediaMeta.AV_CH_LAYOUT_2POINT1 -> "2.1 声道"
-                    IjkMediaMeta.AV_CH_LAYOUT_2_1 -> "立体声"
-                    IjkMediaMeta.AV_CH_LAYOUT_SURROUND -> "环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_3POINT1 -> "3.1 环绕声"
+                    IjkMediaMeta.AV_CH_LAYOUT_MONO -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_mono)
+                    IjkMediaMeta.AV_CH_LAYOUT_STEREO -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_stereo)
+                    IjkMediaMeta.AV_CH_LAYOUT_2POINT1 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_2_1_channel)
+                    IjkMediaMeta.AV_CH_LAYOUT_2_1 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_stereo)
+                    IjkMediaMeta.AV_CH_LAYOUT_SURROUND -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_surround)
+                    IjkMediaMeta.AV_CH_LAYOUT_3POINT1 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_3_1_surround)
                     // IjkMediaMeta.AV_CH_LAYOUT_3POINT1POINT2 -> "3.1.2 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_4POINT0 -> "4.0 四声道"
-                    IjkMediaMeta.AV_CH_LAYOUT_4POINT1 -> "4.1 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_2_2 -> "四声道"
-                    IjkMediaMeta.AV_CH_LAYOUT_QUAD -> "四声道"
+                    IjkMediaMeta.AV_CH_LAYOUT_4POINT0 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_4_0_quad)
+                    IjkMediaMeta.AV_CH_LAYOUT_4POINT1 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_4_1_surround)
+                    IjkMediaMeta.AV_CH_LAYOUT_2_2 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_quad)
+                    IjkMediaMeta.AV_CH_LAYOUT_QUAD -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_quad)
                     // IjkMediaMeta.AV_CH_LAYOUT_CUBE -> "立方声"
-                    IjkMediaMeta.AV_CH_LAYOUT_5POINT0 -> "5.0 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_5POINT1 -> "5.1 环绕声"
+                    IjkMediaMeta.AV_CH_LAYOUT_5POINT0 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_5_0_surround)
+                    IjkMediaMeta.AV_CH_LAYOUT_5POINT1 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_5_1_surround)
                     // IjkMediaMeta.AV_CH_LAYOUT_5POINT1POINT2_BACK -> "5.1.2 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_6POINT0 -> "6.0 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_6POINT1 -> "6.1 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_7POINT0 -> "7.0 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_7POINT1 -> "7.1 环绕声"
+                    IjkMediaMeta.AV_CH_LAYOUT_6POINT0 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_6_0_surround)
+                    IjkMediaMeta.AV_CH_LAYOUT_6POINT1 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_6_1_surround)
+                    IjkMediaMeta.AV_CH_LAYOUT_7POINT0 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_7_0_surround)
+                    IjkMediaMeta.AV_CH_LAYOUT_7POINT1 -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_7_1_surround)
                     // IjkMediaMeta.AV_CH_LAYOUT_7POINT1POINT2 -> "7.1.2 环绕声"
                     // IjkMediaMeta.AV_CH_LAYOUT_7POINT1POINT4_BACK -> "后置 7.1.4 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_7POINT1_WIDE -> "宽域 7.1 环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_7POINT1_WIDE_BACK -> "后置 7.1 环绕声"
+                    IjkMediaMeta.AV_CH_LAYOUT_7POINT1_WIDE -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_7_1_wide)
+                    IjkMediaMeta.AV_CH_LAYOUT_7POINT1_WIDE_BACK -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_7_1_wide_back)
                     // IjkMediaMeta.AV_CH_LAYOUT_7POINT1_TOP_BACK -> "上置 7.1 环绕声"
                     // IjkMediaMeta.AV_CH_LAYOUT_HEXADECAGONAL -> "十六角环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_HEXAGONAL -> "六角环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_OCTAGONAL -> "八角环绕声"
-                    IjkMediaMeta.AV_CH_LAYOUT_STEREO_DOWNMIX -> "立体声下混音"
+                    IjkMediaMeta.AV_CH_LAYOUT_HEXAGONAL -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_hexagonal)
+                    IjkMediaMeta.AV_CH_LAYOUT_OCTAGONAL -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_octagonal)
+                    IjkMediaMeta.AV_CH_LAYOUT_STEREO_DOWNMIX -> context.getString(top.yogiczy.mytv.tv.R.string.ui_audio_stereo_downmix)
                     // IjkMediaMeta.AV_CH_LAYOUT_9POINT0 -> "9.0 环绕声"
                     // IjkMediaMeta.AV_CH_LAYOUT_10POINT2 -> "10.2 环绕声"
                     // IjkMediaMeta.AV_CH_LAYOUT_22POINT2 -> "22.2 环绕声"

@@ -34,6 +34,9 @@ class MainActivity : ComponentActivity() {
     }
     
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 应用语言设置
+        top.yogiczy.mytv.tv.ui.utils.LanguageHelper.applyLanguage(this, top.yogiczy.mytv.tv.ui.utils.Configs.appLanguage)
+        
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE

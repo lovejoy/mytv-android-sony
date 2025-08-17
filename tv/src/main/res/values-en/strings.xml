@@ -30,7 +30,7 @@
     <string name="ui_agreement_agree">Read and Agree</string>
     <string name="ui_agreement_disagree">Exit</string>
     <string name="ui_dashboard_module_live">Live</string>
-    <string name="ui_dashboard_module_all_channels">All Channels</string>
+    <string name="ui_dashboard_module_all_channels">Channels</string>
     <string name="ui_dashboard_module_favorites">Favorites</string>
     <string name="ui_dashboard_module_search">Search</string>
     <string name="ui_dashboard_module_multi_view">Multi-view</string>
@@ -355,5 +355,34 @@
     <string name="ui_epg_item_today">Today</string>
     <string name="ui_epg_item_tomorrow">Tom.</string>
     <string name="ui_epg_item_day_after_tomorrow">Overmorrow</string>
+    <string name="ui_language_setting">Language</string>
+    <string name="ui_language_setting_support">Choose app display language</string>
+    <string name="ui_language_follow_system">Follow System</string>
+    <string name="ui_language_chinese">中文</string>
+    <string name="ui_language_english">English</string>
+    <string name="ui_update_auto_check">Auto Check Updates on Startup</string>
+    <string name="ui_update_auto_check_enabled">App will automatically check for updates on startup</string>
+    <string name="ui_update_auto_check_disabled">App will not check for updates on startup</string>
+    <string name="ui_epg_guide">Guide</string>
+    <string name="ui_epg_today">Today</string>
+    <string name="ui_audio_mono">Mono</string>
+    <string name="ui_audio_stereo">Stereo</string>
+    <string name="ui_audio_stereo_downmix">Stereo Downmix</string>
+    <string name="ui_audio_2_1_channel">2.1 Channel</string>
+    <string name="ui_audio_surround">Surround</string>
+    <string name="ui_audio_3_1_surround">3.1 Surround</string>
+    <string name="ui_audio_4_0_quad">4.0 Quad</string>
+    <string name="ui_audio_4_1_surround">4.1 Surround</string>
+    <string name="ui_audio_quad">Quad</string>
+    <string name="ui_audio_5_0_surround">5.0 Surround</string>
+    <string name="ui_audio_5_1_surround">5.1 Surround</string>
+    <string name="ui_audio_6_0_surround">6.0 Surround</string>
+    <string name="ui_audio_6_1_surround">6.1 Surround</string>
+    <string name="ui_audio_7_0_surround">7.0 Surround</string>
+    <string name="ui_audio_7_1_surround">7.1 Surround</string>
+    <string name="ui_audio_7_1_wide">7.1 Wide Surround</string>
+    <string name="ui_audio_7_1_wide_back">7.1 Wide Back Surround</string>
+    <string name="ui_audio_hexagonal">Hexagonal Surround</string>
+    <string name="ui_audio_octagonal">Octagonal Surround</string>
 
 </resources>

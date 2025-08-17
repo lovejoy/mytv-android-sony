@@ -33,6 +33,9 @@ object Configs {
         /** 画中画启用 */
         APP_PIP_ENABLE,
 
+        /** 应用语言 */
+        APP_LANGUAGE,
+
         /** 上一次最新版本 */
         APP_LAST_LATEST_VERSION,
 
@@ -312,6 +315,11 @@ object Configs {
     var appPipEnable: Boolean
         get() = SP.getBoolean(KEY.APP_PIP_ENABLE.name, false)
         set(value) = SP.putBoolean(KEY.APP_PIP_ENABLE.name, value)
+
+    /** 应用语言 */
+    var appLanguage: String
+        get() = SP.getString(KEY.APP_LANGUAGE.name, "")
+        set(value) = SP.putString(KEY.APP_LANGUAGE.name, value)
 
     /** 上一次最新版本 */
     var appLastLatestVersion: String
@@ -930,6 +938,7 @@ object Configs {
         return Partial(
             appBootLaunch = appBootLaunch,
             appPipEnable = appPipEnable,
+            appLanguage = appLanguage,
             appLastLatestVersion = appLastLatestVersion,
             appAgreementAgreed = appAgreementAgreed,
             appStartupScreen = appStartupScreen,
@@ -1022,6 +1031,7 @@ object Configs {
     fun fromPartial(configs: Partial) {
         configs.appBootLaunch?.let { appBootLaunch = it }
         configs.appPipEnable?.let { appPipEnable = it }
+        configs.appLanguage?.let { appLanguage = it }
         configs.appLastLatestVersion?.let { appLastLatestVersion = it }
         configs.appAgreementAgreed?.let { appAgreementAgreed = it }
         configs.appStartupScreen?.let { appStartupScreen = it }
@@ -1116,6 +1126,7 @@ object Configs {
     data class Partial(
         val appBootLaunch: Boolean? = null,
         val appPipEnable: Boolean? = null,
+        val appLanguage: String? = null,
         val appLastLatestVersion: String? = null,
         val appAgreementAgreed: Boolean? = null,
         val appStartupScreen: String? = null,

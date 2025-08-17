@@ -45,6 +45,15 @@ class SettingsViewModel : ViewModel() {
             afterSetWhenCloudSyncAutoPull()
         }
 
+    private var _appLanguage by mutableStateOf("")
+    var appLanguage: String
+        get() = _appLanguage
+        set(value) {
+            _appLanguage = value
+            Configs.appLanguage = value
+            afterSetWhenCloudSyncAutoPull()
+        }
+
     private var _appLastLatestVersion by mutableStateOf("")
     var appLastLatestVersion: String
         get() = _appLastLatestVersion
@@ -850,6 +859,7 @@ class SettingsViewModel : ViewModel() {
     fun refresh() {
         _appBootLaunch = Configs.appBootLaunch
         _appPipEnable = Configs.appPipEnable
+        _appLanguage = Configs.appLanguage
         _appLastLatestVersion = Configs.appLastLatestVersion
         _appAgreementAgreed = Configs.appAgreementAgreed
         _appStartupScreen = Configs.appStartupScreen

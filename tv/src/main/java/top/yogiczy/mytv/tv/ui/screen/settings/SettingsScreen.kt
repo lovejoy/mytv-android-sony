@@ -45,6 +45,7 @@ import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvHybridMo
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiControlSettingScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvSourceCacheTimeScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsIptvSourceScreen
+import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsLanguageScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsNetworkRetryCountScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiDensityScaleRatioScreen
 import top.yogiczy.mytv.tv.ui.screen.settings.subcategories.SettingsUiFontScaleRatioScreen
@@ -102,6 +103,7 @@ fun SettingsScreen(
                 composable(SettingsCategories.APP.name) {
                     SettingsAppScreen(
                         onReload = onReload,
+                        onLanguageSettingScreen = { navController.navigateSingleTop(SettingsSubCategories.LANGUAGE.name) },
                         onBackPressed = { navController.navigateUp() },
                     )
                 }
@@ -549,6 +551,13 @@ fun SettingsScreen(
 
                 composable(SettingsSubCategories.UI_SETTINGS_DECODER_INFO.name) {
                     SettingsDecoderInfoScreen(
+                        onBackPressed = { navController.navigateUp() },
+                    )
+                }
+
+                composable(SettingsSubCategories.LANGUAGE.name) {
+                    SettingsLanguageScreen(
+                        settingsViewModel = settingsViewModel,
                         onBackPressed = { navController.navigateUp() },
                     )
                 }

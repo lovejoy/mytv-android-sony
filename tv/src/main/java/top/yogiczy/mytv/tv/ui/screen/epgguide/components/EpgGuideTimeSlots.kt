@@ -10,11 +10,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import top.yogiczy.mytv.tv.R
 import top.yogiczy.mytv.tv.ui.material.LazyRow
 import top.yogiczy.mytv.tv.ui.rememberChildPadding
 import top.yogiczy.mytv.tv.ui.screen.components.AppScreen
@@ -74,7 +76,7 @@ fun EpgGuideTimeSlots(
                 item {
                     EpgGuideDateItem(
                         modifier = if (index == 0) Modifier.focusRequester(runtime.firstItemFocusRequester) else Modifier,
-                        text = if (index == 0) "今天" else dateFormat.format(date),
+                        text = if (index == 0) stringResource(R.string.ui_epg_today) else dateFormat.format(date),
                         isSelected = selectedDateProvider() == date,
                         onSelected = { onDateSelected(date) },
                     )
