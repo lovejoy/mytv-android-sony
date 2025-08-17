@@ -30,9 +30,11 @@ fun SubtitleTrackItemList(
     onUserAction: () -> Unit = {},
 ) {
     val trackList = trackListProvider()
+    // 过滤掉shortLabel为空字符串的字幕轨道
+    val filteredTrackList = trackList.filter { it.shortLabel.isNotBlank() }
 
     val listState =
-        rememberLazyListState(max(0, trackList.indexOfFirst { it.isSelected == true } - 2))
+        rememberLazyListState(max(0, filteredTrackList.indexOfFirst { it.isSelected == true } - 2))
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.isScrollInProgress }
@@ -50,7 +52,7 @@ fun SubtitleTrackItemList(
             ListItem(
                 modifier = modifier
                     .ifElse(
-                        trackList.all { it.isSelected != true },
+                        filteredTrackList.all { it.isSelected != true },
                         Modifier.focusOnLaunchedSaveable()
                     )
                     .handleKeyEvents(onSelect = { onSelected(null) }),
@@ -58,12 +60,12 @@ fun SubtitleTrackItemList(
                 onClick = {},
                 headlineContent = { Text("关闭") },
                 trailingContent = {
-                    RadioButton(selected = trackList.all { it.isSelected != true }, onClick = {})
+                    RadioButton(selected = filteredTrackList.all { it.isSelected != true }, onClick = {})
                 },
             )
         }
 
-        items(trackList) { track ->
+        items(filteredTrackList) { track ->
             SubtitleTrackItem(
                 trackProvider = { track },
                 onSelected = { onSelected(track) },
